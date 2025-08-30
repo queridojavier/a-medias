@@ -1,4 +1,4 @@
-# Gestor de Finanzas en Pareja (PWA)
+# A Medias (PWA)
 
 Calculadora simple para repartir aportaciones y transferencias mensuales en pareja.  
 Funciona en navegador, se puede **instalar como app** (PWA) y **opera offline** tras la primera carga. No usa servidor ni bases de datos: solo `localStorage`.
