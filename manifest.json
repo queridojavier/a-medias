@@ -1,6 +1,6 @@
 {
-  "name": "Gestor de Finanzas en Pareja",
-  "short_name": "Finanzas",
+  "name": "A Medias",
+  "short_name": "AMedias",
   "start_url": "./?source=pwa",
   "scope": "./",
   "display": "standalone",
