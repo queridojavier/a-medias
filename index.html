@@ -261,22 +261,24 @@
       const transferencia1 = round2(sobrante1 - ajuste);
       const transferencia2 = round2(sobrante2 + ajuste);
 
-      // 8) Pintar UI
-      document.getElementById('ingresoTotal').textContent = money(ingresoTotal);
-      document.getElementById('dineroRepartir').textContent = money(dineroRepartir);
+      // 8) Pintar UI (sin sobrantes intermedios)
+document.getElementById('ingresoTotal').textContent = money(ingresoTotal);
+document.getElementById('dineroRepartir').textContent = money(dineroRepartir);
 
-      document.getElementById('porcentaje1').textContent = `${p1pct.toFixed(1)}%`;
-      document.getElementById('porcentaje2').textContent = `${p2pct.toFixed(1)}%`;
+// Porcentajes (formato español con coma)
+const fmtPct = n => new Intl.NumberFormat('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(n);
+document.getElementById('porcentaje1').textContent = `${fmtPct(p1 * 100)}%`;
+document.getElementById('porcentaje2').textContent = `${fmtPct((1 - p1) * 100)}%`;
 
-      document.getElementById('comun1').textContent = money(comun1);
-      document.getElementById('comun2').textContent = money(comun2);
-      document.getElementById('sobrante1').textContent = money(sobrante1);
-      document.getElementById('sobrante2').textContent = money(sobrante2);
+// Aportaciones al fondo (solo estas dos cajas)
+const c1 = document.getElementById('comun1'); if (c1) c1.textContent = money(comun1);
+const c2 = document.getElementById('comun2'); if (c2) c2.textContent = money(comun2);
 
-      document.getElementById('transferencia1').textContent = money(transferencia1);
-      document.getElementById('transferencia2').textContent = money(transferencia2);
+// Transferencias finales (lo que importa)
+document.getElementById('transferencia1').textContent = money(transferencia1);
+document.getElementById('transferencia2').textContent = money(transferencia2);
 
-      saveState();
+saveState();
     }
 
     function resetForm() {
