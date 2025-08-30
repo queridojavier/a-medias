@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Calculadora Financiera para Parejas</title>
+
+  <!-- Tailwind por CDN (se cacheará en runtime para offline tras 1ª carga) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fuentes -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <meta name="theme-color" content="#111827">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .card {
+      background-color: white; border-radius: 0.75rem;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      padding: 1.5rem; transition: all 0.3s ease;
+    }
+    .input-group { position: relative; }
+    .input-group span {
+      position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%);
+      color: #6b7280; pointer-events: none;
+    }
+    .input-field {
+      padding-left: 2rem; width: 100%; border-radius: 0.5rem; border: 1px solid #d1d5db;
+      padding-top: 0.5rem; padding-bottom: 0.5rem;
+      transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
+    .input-field:focus {
+      outline: none; border-color: #4f46e5; box-shadow: 0 0 0 2px rgba(79,70,229,0.2);
+    }
+    .result-box { border-radius: 0.75rem; padding: 1.5rem; text-align: center; }
+  </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800 flex items-center justify-center min-h-screen p-4">
+  <main class="w-full max-w-4xl mx-auto">
+    <div class="text-center mb-8">
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Gestor de Finanzas en Pareja</h1>
+      <p class="text-slate-600 mt-2">Introduce vuestros datos para calcular las transferencias mensuales.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      <!-- Columna de Entradas -->
+      <div class="lg:col-span-2 space-y-6">
+        <div class="card">
+          <h2 class="text-xl font-semibold mb-4 text-slate-700">1. Datos del Mes</h2>
+
+          <!-- Ingresos -->
+          <div class="space-y-4">
+            <div>
+              <label for="nomina1" class="block text-sm font-medium text-slate-600 mb-1">Tu Nómina</label>
+              <div class="input-group">
+                <span>€</span>
+                <input type="number" id="nomina1" class="input-field" placeholder="1800" value="1800"
+                       step="0.01" inputmode="decimal" min="0">
+              </div>
+            </div>
+            <div>
+              <label for="nomina2" class="block text-sm font-medium text-slate-600 mb-1">Nómina de tu Pareja</label>
+              <div class="input-group">
+                <span>€</span>
+                <input type="number" id="nomina2" class="input-field" placeholder="1500" value="1500"
+                       step="0.01" inputmode="decimal" min="0">
+              </div>
+            </div>
+          </div>
+
+          <!-- Fondo común y ajuste -->
+          <div class="mt-6 pt-6 border-t border-slate-200 space-y-4">
+            <div>
+              <label for="fondoComun" class="block text-sm font-medium text-slate-600 mb-1">Aportación a la cuenta común</label>
+              <div class="input-group">
+                <span>€</span>
+                <input type="number" id="fondoComun" class="input-field" placeholder="1200" value="1200"
+                       step="0.01" inputmode="decimal" min="0">
+              </div>
+            </div>
+            <div>
+              <label for="ajuste" class="block text-sm font-medium text-slate-600 mb-1">Ajuste entre vosotros</label>
+              <div class="input-group">
+                <span>€</span>
+                <input type="number" id="ajuste" class="input-field" placeholder="50" value="50"
+                       step="0.01" inputmode="decimal">
+              </div>
+              <p class="text-xs text-slate-500 mt-1.5">Positivo si te deben a ti, negativo si debes tú.</p>
+            </div>
+          </div>
+
+          <!-- Acciones -->
+          <div class="mt-6 flex items-center gap-3">
+            <button id="btnReset"
+                    class="px-3 py-2 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-sm">
+              Restablecer valores
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna de Resultados -->
+      <div class="lg:col-span-3 space-y-6">
+        <div class="card" aria-live="polite">
+          <h2 class="text-xl font-semibold mb-4 text-slate-700">2. Resumen y Reparto</h2>
+
+          <div class="space-y-3 text-slate-600">
+            <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+              <span class="font-medium">Ingresos totales:</span>
+              <span id="ingresoTotal" class="font-bold text-lg text-slate-800">3.300,00 €</span>
+            </div>
+            <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+              <span class="font-medium">Dinero a repartir:</span>
+              <span id="dineroRepartir" class="font-bold text-lg text-green-600">2.100,00 €</span>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-slate-200">
+              <h3 class="font-semibold text-center mb-2">Aportación proporcional</h3>
+              <div class="flex justify-around items-center text-center">
+                <div>
+                  <div id="porcentaje1" class="font-bold text-2xl text-indigo-600">54,5%</div>
+                  <div class="text-sm text-slate-500">Tu aportación</div>
+                </div>
+                <div>
+                  <div id="porcentaje2" class="font-bold text-2xl text-indigo-600">45,5%</div>
+                  <div class="text-sm text-slate-500">Aportación pareja</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Aportaciones al fondo y sobrantes -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 text-sm text-slate-600">
+              <div class="p-3 bg-slate-50 rounded-lg">
+                <span class="font-medium">Tu aportación al fondo:</span> <span id="comun1">—</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-lg">
+                <span class="font-medium">Aportación pareja:</span> <span id="comun2">—</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-lg">
+                <span class="font-medium">Tu sobrante tras aportar:</span> <span id="sobrante1">—</span>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-lg">
+                <span class="font-medium">Sobrante pareja:</span> <span id="sobrante2">—</span>
+              </div>
+            </div>
+
+            <!-- Aviso -->
+            <p id="warning" class="mt-2 text-sm text-amber-700"></p>
+          </div>
+        </div>
+
+        <div class="card" aria-live="polite">
+          <h2 class="text-xl font-semibold mb-4 text-slate-700">3. ✅ Resultado Final: Transferencias</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="result-box bg-indigo-50 text-indigo-900">
+              <h3 class="font-semibold mb-2">Transferir a tu Cuenta</h3>
+              <p id="transferencia1" class="text-3xl font-bold">1.095,45 €</p>
+            </div>
+            <div class="result-box bg-teal-50 text-teal-900">
+              <h3 class="font-semibold mb-2">Transferir a Cuenta Pareja</h3>
+              <p id="transferencia2" class="text-3xl font-bold">1.004,55 €</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="text-center mt-8 text-sm text-slate-500">
+      <p>Creado para una gestión financiera clara y justa.</p>
+    </footer>
+  </main>
+
+  <!-- Registro del Service Worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(console.error);
+      });
+    }
+  </script>
+
+  <!-- Lógica de la app -->
+  <script>
+    // Formato de moneda y redondeo fiable
+    const money = n => new Intl.NumberFormat('es-ES', {
+      style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2
+    }).format(n);
+
+    const round2 = n => Math.round((Number(n) + Number.EPSILON) * 100) / 100;
+
+    // Lectura segura (permite negativo solo en ajuste)
+    const read = (id, { allowNegative = false } = {}) => {
+      const el = document.getElementById(id);
+      if (!el) return 0;
+      let v = String(el.value ?? '').replace(',', '.');
+      v = parseFloat(v);
+      if (Number.isNaN(v)) v = 0;
+      if (!allowNegative) v = Math.max(0, v);
+      return v;
+    };
+
+    const saveState = () => {
+      const data = {
+        nomina1: read('nomina1'),
+        nomina2: read('nomina2'),
+        fondoComun: read('fondoComun'),
+        ajuste: read('ajuste', { allowNegative: true })
+      };
+      localStorage.setItem('parejas_calc', JSON.stringify(data));
+    };
+
+    const loadState = () => {
+      try {
+        const data = JSON.parse(localStorage.getItem('parejas_calc') || '{}');
+        if (data.nomina1 != null) document.getElementById('nomina1').value = data.nomina1;
+        if (data.nomina2 != null) document.getElementById('nomina2').value = data.nomina2;
+        if (data.fondoComun != null) document.getElementById('fondoComun').value = data.fondoComun;
+        if (data.ajuste != null) document.getElementById('ajuste').value = data.ajuste;
+      } catch {}
+    };
+
+    let defaultState = {};
+
+    function calculate() {
+      // 1) Entradas
+      const nomina1 = read('nomina1');
+      const nomina2 = read('nomina2');
+      const fondoComun = read('fondoComun');
+      const ajuste = read('ajuste', { allowNegative: true });
+
+      // 2) Totales y porcentajes
+      const ingresoTotal = round2(nomina1 + nomina2);
+
+      let p1 = ingresoTotal > 0 ? nomina1 / ingresoTotal : 0;
+      p1 = Math.min(1, Math.max(0, p1));
+      let p1pct = round2(p1 * 100);
+      let p2pct = round2(100 - p1pct);
+
+      // 3) Aportaciones al fondo común
+      const comun1 = round2(fondoComun * p1);
+      const comun2 = round2(fondoComun * (1 - p1));
+
+      // 4) Sobrante a repartir
+      let dineroRepartir = round2(ingresoTotal - fondoComun);
+
+      // 5) Límite: fondo > ingresos
+      const warningEl = document.getElementById('warning');
+      if (warningEl) warningEl.textContent = '';
+      if (dineroRepartir < 0) {
+        dineroRepartir = 0;
+        if (warningEl) warningEl.textContent =
+          'La aportación a la cuenta común supera los ingresos totales. Revisa las cifras.';
+      }
+
+      // 6) Sobrante individual proporcional
+      const sobrante1 = round2(nomina1 - comun1);
+      const sobrante2 = round2(nomina2 - comun2);
+
+      // 7) Ajuste: positivo significa que te deben a ti
+      const transferencia1 = round2(sobrante1 - ajuste);
+      const transferencia2 = round2(sobrante2 + ajuste);
+
+      // 8) Pintar UI
+      document.getElementById('ingresoTotal').textContent = money(ingresoTotal);
+      document.getElementById('dineroRepartir').textContent = money(dineroRepartir);
+
+      document.getElementById('porcentaje1').textContent = `${p1pct.toFixed(1)}%`;
+      document.getElementById('porcentaje2').textContent = `${p2pct.toFixed(1)}%`;
+
+      document.getElementById('comun1').textContent = money(comun1);
+      document.getElementById('comun2').textContent = money(comun2);
+      document.getElementById('sobrante1').textContent = money(sobrante1);
+      document.getElementById('sobrante2').textContent = money(sobrante2);
+
+      document.getElementById('transferencia1').textContent = money(transferencia1);
+      document.getElementById('transferencia2').textContent = money(transferencia2);
+
+      saveState();
+    }
+
+    function resetForm() {
+      try { localStorage.removeItem('parejas_calc'); } catch {}
+      document.getElementById('nomina1').value = defaultState.nomina1 ?? 0;
+      document.getElementById('nomina2').value = defaultState.nomina2 ?? 0;
+      document.getElementById('fondoComun').value = defaultState.fondoComun ?? 0;
+      document.getElementById('ajuste').value = defaultState.ajuste ?? 0;
+      calculate();
+    }
+
+    window.onload = () => {
+      // Guarda valores por defecto iniciales
+      defaultState = {
+        nomina1: parseFloat(document.getElementById('nomina1').value) || 0,
+        nomina2: parseFloat(document.getElementById('nomina2').value) || 0,
+        fondoComun: parseFloat(document.getElementById('fondoComun').value) || 0,
+        ajuste: parseFloat(document.getElementById('ajuste').value) || 0
+      };
+
+      loadState();
+      calculate();
+
+      // Debounce ligero para inputs
+      const inputs = ['nomina1','nomina2','fondoComun','ajuste'];
+      let t;
+      inputs.forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener('input', () => {
+          clearTimeout(t);
+          t = setTimeout(calculate, 80);
+        });
+      });
+
+      document.getElementById('btnReset')?.addEventListener('click', resetForm);
+    };
+  </script>
+</body>
+</html>
