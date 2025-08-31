@@ -9,44 +9,55 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Fuentes -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- PWA -->
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="icon" href="./icons/icon-192.png" type="image/png">
   <meta name="apple-mobile-web-app-title" content="A Medias">
-  <meta name="theme-color" content="#111827">
+  <meta name="theme-color" content="#EF7D70">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
+  <!-- Estilo de marca y tarjetas -->
   <style>
-    body { font-family: 'Inter', sans-serif; }
-    .card {
-      background-color: white; border-radius: 0.75rem;
-      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-      padding: 1.5rem; transition: all 0.3s ease;
+    :root{
+      --primary:#EF7D70;      /* salmón */
+      --primary-700:#E15F54;
+      --ink:#0f172a;
+      --muted:#e5e7eb;
+      --card:#ffffff;
+      --bg:#f7f8fb;
     }
-    .input-group { position: relative; }
-    .input-group span {
-      position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%);
-      color: #6b7280; pointer-events: none;
+    body{ font-family:'Inter',system-ui,sans-serif; background: var(--bg); }
+    .card{
+      background:var(--card);
+      border-radius:16px;
+      border:1px solid #e6e8ef;
+      box-shadow:0 8px 24px rgba(15,23,42,.06);
+      padding:1.25rem;
     }
-    .input-field {
-      padding-left: 2rem; width: 100%; border-radius: 0.5rem; border: 1px solid #d1d5db;
-      padding-top: 0.5rem; padding-bottom: 0.5rem;
-      transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    }
-    .input-field:focus {
-      outline: none; border-color: #4f46e5; box-shadow: 0 0 0 2px rgba(79,70,229,0.2);
-    }
-    .result-box { border-radius: 0.75rem; padding: 1.5rem; text-align: center; }
+    .result-box{ border-radius:16px; padding:1.25rem; text-align:center; }
+    .brand-dot{ width:.7rem; height:.7rem; border-radius:999px; display:inline-block; }
+      .badge-success{
+    background: rgba(16,185,129,.14);
+    color: #0f7a4e;
+    padding: .15rem .5rem;
+    border-radius: .5rem;
+  }
+  .donut{
+    background: conic-gradient(var(--primary) 60%, var(--muted) 0);
+  }
   </style>
 </head>
 
-<body class="bg-slate-50 text-slate-800 flex items-center justify-center min-h-screen p-4">
+<body class="text-slate-800 flex items-center justify-center min-h-screen p-4">
   <main class="w-full max-w-4xl mx-auto">
     <div class="text-center mb-8">
-      <h1 class="text-3xl md:text-4xl font-bold text-slate-900">A Medias</h1>
+      <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight" style="color:var(--ink)">
+        A <span style="color:var(--primary)">Medias</span>
+      </h1>
       <p class="text-slate-600 mt-2">Calculadora rápida para repartir gastos en pareja.</p>
     </div>
 
@@ -56,12 +67,12 @@
         <div class="card">
           <h2 class="text-xl font-semibold mb-4 text-slate-700">1. Datos del Mes</h2>
 
-          <!-- Modo de reparto (el “dongle”) -->
+          <!-- Toggle de modo -->
           <div class="mb-5">
             <label class="block text-sm font-medium text-slate-600 mb-2">Modo de reparto</label>
             <div class="inline-flex rounded-xl bg-slate-100 p-1" role="group" aria-label="Modo de reparto">
               <button id="mode-prop"
-                      class="px-3 py-1.5 rounded-lg text-sm font-medium bg-white shadow text-slate-900"
+                      class="px-3 py-1.5 rounded-lg text-sm font-medium bg-white shadow text-slate-900 ring-1 ring-[var(--primary)]"
                       type="button" aria-pressed="true">
                 Proporcional
               </button>
@@ -78,18 +89,18 @@
           <div class="space-y-4">
             <div>
               <label for="nomina1" class="block text-sm font-medium text-slate-600 mb-1">Tu nómina</label>
-              <div class="input-group">
-                <span>€</span>
-                <input type="number" id="nomina1" class="input-field" placeholder="1800" value="1800"
-                       step="0.01" inputmode="decimal" min="0">
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
+                <input type="number" id="nomina1" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
+                       placeholder="1800" value="1800" step="0.01" inputmode="decimal" min="0">
               </div>
             </div>
             <div>
               <label for="nomina2" class="block text-sm font-medium text-slate-600 mb-1">Nómina de tu pareja</label>
-              <div class="input-group">
-                <span>€</span>
-                <input type="number" id="nomina2" class="input-field" placeholder="1500" value="1500"
-                       step="0.01" inputmode="decimal" min="0">
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
+                <input type="number" id="nomina2" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
+                       placeholder="1500" value="1500" step="0.01" inputmode="decimal" min="0">
               </div>
             </div>
           </div>
@@ -98,18 +109,18 @@
           <div class="mt-6 pt-6 border-t border-slate-200 space-y-4">
             <div>
               <label for="fondoComun" class="block text-sm font-medium text-slate-600 mb-1">Aportación a la cuenta común</label>
-              <div class="input-group">
-                <span>€</span>
-                <input type="number" id="fondoComun" class="input-field" placeholder="1200" value="1200"
-                       step="0.01" inputmode="decimal" min="0">
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
+                <input type="number" id="fondoComun" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
+                       placeholder="1200" value="1200" step="0.01" inputmode="decimal" min="0">
               </div>
             </div>
             <div>
               <label for="ajuste" class="block text-sm font-medium text-slate-600 mb-1">Ajuste entre vosotros</label>
-              <div class="input-group">
-                <span>€</span>
-                <input type="number" id="ajuste" class="input-field" placeholder="50" value="50"
-                       step="0.01" inputmode="decimal">
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
+                <input type="number" id="ajuste" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
+                       placeholder="0" value="0" step="0.01" inputmode="decimal">
               </div>
               <p class="text-xs text-slate-500 mt-1.5">Positivo si te deben a ti, negativo si debes tú.</p>
             </div>
@@ -137,24 +148,37 @@
             </div>
             <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
               <span class="font-medium">Dinero a repartir:</span>
-              <span id="dineroRepartir" class="font-bold text-lg text-green-600">2.100,00 €</span>
+              <span id="dineroRepartir" class="badge-success font-bold text-lg">2.100,00 €</span>
             </div>
 
+            <!-- Donut + leyenda -->
             <div class="mt-4 pt-4 border-t border-slate-200">
-              <h3 class="font-semibold text-center mb-2">Porcentajes</h3>
-              <div class="flex justify-around items-center text-center">
-                <div>
-                  <div id="porcentaje1" class="font-bold text-2xl text-indigo-600">54,5%</div>
-                  <div class="text-sm text-slate-500">Tu aportación</div>
-                </div>
-                <div>
-                  <div id="porcentaje2" class="font-bold text-2xl text-indigo-600">45,5%</div>
-                  <div class="text-sm text-slate-500">Aportación pareja</div>
-                </div>
+              <h3 class="font-semibold text-center mb-3">Distribución</h3>
+              <div class="flex items-center justify-center gap-6">
+                <!-- Donut -->
+                <div class="relative w-36 h-36 rounded-full donut" id="donut" aria-label="Distribución de aportación">
+  <div class="absolute inset-6 rounded-full bg-white ring-1 ring-[#e6e8ef]"></div>
+  <div class="absolute inset-0 grid place-items-center">
+    <span id="p1Center" class="font-extrabold text-2xl" style="color:var(--ink)">60%</span>
+  </div>
+</div>
+                <!-- Leyenda -->
+                <ul class="text-sm text-slate-600">
+                  <li class="mb-2">
+                    <span class="brand-dot" style="background:var(--primary)"></span>
+                    <span class="font-medium text-slate-700">Tu parte</span>:
+                    <span id="porcentaje1" class="font-semibold">60%</span>
+                  </li>
+                  <li>
+                    <span class="brand-dot" style="background:var(--muted); border:1px solid #cdd1d8"></span>
+                    <span class="font-medium text-slate-700">Pareja</span>:
+                    <span id="porcentaje2" class="font-semibold">40%</span>
+                  </li>
+                </ul>
               </div>
             </div>
 
-            <!-- Aportaciones al fondo (sin mostrar sobrantes intermedios) -->
+            <!-- Aportaciones al fondo -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 text-sm text-slate-600">
               <div class="p-3 bg-slate-50 rounded-lg">
                 <span class="font-medium">Tu aportación al fondo:</span> <span id="comun1">—</span>
@@ -172,13 +196,13 @@
         <div class="card" aria-live="polite">
           <h2 class="text-xl font-semibold mb-4 text-slate-700">3. ✅ Resultado final: transferencias</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="result-box bg-indigo-50 text-indigo-900">
+            <div class="result-box" style="background:rgba(239,125,112,.12); color:#3f2c2b; border:1px solid #f3d1cd">
               <h3 class="font-semibold mb-2">Transferir a tu cuenta</h3>
-              <p id="transferencia1" class="text-3xl font-bold">1.095,45 €</p>
+              <p id="transferencia1" class="text-3xl font-extrabold">1.095,45 €</p>
             </div>
-            <div class="result-box bg-teal-50 text-teal-900">
+            <div class="result-box" style="background:rgba(16,185,129,.12); color:#135b46; border:1px solid #cbe9db">
               <h3 class="font-semibold mb-2">Transferir a cuenta pareja</h3>
-              <p id="transferencia2" class="text-3xl font-bold">1.004,55 €</p>
+              <p id="transferencia2" class="text-3xl font-extrabold">1.004,55 €</p>
             </div>
           </div>
         </div>
@@ -190,18 +214,27 @@
     </footer>
   </main>
 
-  <!-- Registro del Service Worker -->
+  <!-- Registro del Service Worker (desactivado en desarrollo/local) -->
   <script>
-    if ('serviceWorker' in navigator) {
+    const isDevHost = ['localhost','127.0.0.1'].includes(location.hostname) || location.hostname.startsWith('192.168.');
+    if ('serviceWorker' in navigator && !isDevHost) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(console.error);
       });
+    } else {
+      // Si estás en local, intenta desregistrar SWs previos y limpiar cachés
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
+      }
+      if ('caches' in window) {
+        caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+      }
     }
   </script>
 
   <!-- Lógica de la app -->
   <script>
-    // ---- Utilidades ----
+    // Utilidades
     const money = n => new Intl.NumberFormat('es-ES', {
       style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2
     }).format(n);
@@ -218,9 +251,8 @@
       return v;
     };
 
-    // ---- Estado ----
-    let mode = 'prop'; // 'prop' (proporcional) | 'eq' (50/50)
-
+    // Estado
+    let mode = 'prop'; // 'prop' | 'eq'
     const saveState = () => {
       const data = {
         nomina1: read('nomina1'),
@@ -243,7 +275,7 @@
       } catch {}
     };
 
-    // ---- Cálculo principal ----
+    // Cálculo principal
     function calculate() {
       const nomina1 = read('nomina1');
       const nomina2 = read('nomina2');
@@ -252,10 +284,10 @@
 
       const ingresoTotal = round2(nomina1 + nomina2);
 
-      // Porcentaje según modo: proporcional o 50/50
+      // Porcentaje según modo
       let p1 = mode === 'eq'
         ? 0.5
-        : (ingresoTotal > 0 ? nomina1 / ingresoTotal : 0.5); // si 0 ingresos, 50/50 por defecto
+        : (ingresoTotal > 0 ? nomina1 / ingresoTotal : 0.5);
       p1 = Math.min(1, Math.max(0, p1));
 
       const comun1 = round2(fondoComun * p1);
@@ -281,46 +313,52 @@
       document.getElementById('ingresoTotal').textContent = money(ingresoTotal);
       document.getElementById('dineroRepartir').textContent = money(dineroRepartir);
 
-      document.getElementById('porcentaje1').textContent = `${fmtPct(p1 * 100)}%`;
-      document.getElementById('porcentaje2').textContent = `${fmtPct((1 - p1) * 100)}%`;
+      const p1pct = p1 * 100;
+      document.getElementById('porcentaje1').textContent = `${fmtPct(p1pct)}%`;
+      document.getElementById('porcentaje2').textContent = `${fmtPct(100 - p1pct)}%`;
 
+      // Donut
+      const p1deg = Math.round(p1 * 360);
+      const donut = document.getElementById('donut');
+      if (donut) donut.style.background = `conic-gradient(var(--primary) ${p1deg}deg, var(--muted) 0)`;
+      const p1Center = document.getElementById('p1Center');
+      if (p1Center) p1Center.textContent = `${fmtPct(p1pct)}%`;
+
+      // Aportaciones y resultados
       document.getElementById('comun1').textContent = money(comun1);
       document.getElementById('comun2').textContent = money(comun2);
-
       document.getElementById('transferencia1').textContent = money(transferencia1);
       document.getElementById('transferencia2').textContent = money(transferencia2);
 
       saveState();
     }
 
-    // ---- UI Modo ----
+    // UI del modo
     function updateModeUI() {
       const btnProp = document.getElementById('mode-prop');
       const btnEq = document.getElementById('mode-eq');
       const hint = document.getElementById('mode-hint');
 
       if (mode === 'prop') {
-        btnProp.className = "px-3 py-1.5 rounded-lg text-sm font-medium bg-white shadow text-slate-900";
+        btnProp.className = "px-3 py-1.5 rounded-lg text-sm font-medium bg-white shadow text-slate-900 ring-1 ring-[var(--primary)]";
         btnEq.className = "px-3 py-1.5 rounded-lg text-sm font-medium text-slate-700 hover:text-slate-900";
-        btnProp.setAttribute('aria-pressed', 'true');
-        btnEq.setAttribute('aria-pressed', 'false');
+        btnProp.setAttribute('aria-pressed','true'); btnEq.setAttribute('aria-pressed','false');
         hint.textContent = "Reparte según el peso de cada nómina.";
       } else {
-        btnEq.className = "px-3 py-1.5 rounded-lg text-sm font-medium bg-white shadow text-slate-900";
+        btnEq.className = "px-3 py-1.5 rounded-lg text-sm font-medium bg-white shadow text-slate-900 ring-1 ring-[var(--primary)]";
         btnProp.className = "px-3 py-1.5 rounded-lg text-sm font-medium text-slate-700 hover:text-slate-900";
-        btnEq.setAttribute('aria-pressed', 'true');
-        btnProp.setAttribute('aria-pressed', 'false');
+        btnEq.setAttribute('aria-pressed','true'); btnProp.setAttribute('aria-pressed','false');
         hint.textContent = "Reparte exactamente al 50% cada concepto.";
       }
     }
 
-    function setMode(m) {
+    function setMode(m){
       mode = m;
       updateModeUI();
       calculate();
     }
 
-    // ---- Bootstrap ----
+    // Bootstrap
     let defaultState = {};
     window.onload = () => {
       defaultState = {
