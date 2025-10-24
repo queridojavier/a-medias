@@ -450,8 +450,14 @@
     const todayISO = () => new Date().toISOString().slice(0, 10);
     const uid = () => (window.crypto?.randomUUID?.() ?? `id-${Date.now().toString(36)}-${Math.random().toString(16).slice(2)}`);
 
+    const elementCache = {};
+    const getEl = id => {
+      if (!(id in elementCache)) elementCache[id] = document.getElementById(id);
+      return elementCache[id];
+    };
+
     const read = (id, { allowNegative = false } = {}) => {
-      const el = document.getElementById(id);
+      const el = getEl(id);
       if (!el) return 0;
       let v = String(el.value ?? '').replace(',', '.');
       v = parseFloat(v);
@@ -481,10 +487,10 @@
     const loadState = () => {
       try {
         const data = JSON.parse(localStorage.getItem('parejas_calc') || '{}');
-        if (data.nomina1 != null) document.getElementById('nomina1').value = data.nomina1;
-        if (data.nomina2 != null) document.getElementById('nomina2').value = data.nomina2;
-        if (data.fondoComun != null) document.getElementById('fondoComun').value = data.fondoComun;
-        if (data.ajuste != null) document.getElementById('ajuste').value = data.ajuste;
+        if (data.nomina1 != null) getEl('nomina1').value = data.nomina1;
+        if (data.nomina2 != null) getEl('nomina2').value = data.nomina2;
+        if (data.fondoComun != null) getEl('fondoComun').value = data.fondoComun;
+        if (data.ajuste != null) getEl('ajuste').value = data.ajuste;
         if (data.mode === 'eq' || data.mode === 'prop') mode = data.mode;
       } catch {}
     };
@@ -509,7 +515,7 @@
 
       let dineroRepartir = round2(ingresoTotal - fondoComun);
 
-      const warningEl = document.getElementById('warning');
+      const warningEl = getEl('warning');
       if (warningEl) warningEl.textContent = '';
       if (dineroRepartir < 0) {
         dineroRepartir = 0;
@@ -524,25 +530,25 @@
       const transferencia2 = round2(sobrante2 + ajuste);
 
       // Pintar UI
-      document.getElementById('ingresoTotal').textContent = money(ingresoTotal);
-      document.getElementById('dineroRepartir').textContent = money(dineroRepartir);
+      getEl('ingresoTotal').textContent = money(ingresoTotal);
+      getEl('dineroRepartir').textContent = money(dineroRepartir);
 
       const p1pct = p1 * 100;
-      document.getElementById('porcentaje1').textContent = `${fmtPct(p1pct)}%`;
-      document.getElementById('porcentaje2').textContent = `${fmtPct(100 - p1pct)}%`;
+      getEl('porcentaje1').textContent = `${fmtPct(p1pct)}%`;
+      getEl('porcentaje2').textContent = `${fmtPct(100 - p1pct)}%`;
 
       // Donut
       const p1deg = Math.round(p1 * 360);
-      const donut = document.getElementById('donut');
+      const donut = getEl('donut');
       if (donut) donut.style.background = `conic-gradient(var(--primary) ${p1deg}deg, var(--muted) 0)`;
-      const p1Center = document.getElementById('p1Center');
+      const p1Center = getEl('p1Center');
       if (p1Center) p1Center.textContent = `${fmtPct(p1pct)}%`;
 
       // Aportaciones y resultados
-      document.getElementById('comun1').textContent = money(comun1);
-      document.getElementById('comun2').textContent = money(comun2);
-      document.getElementById('transferencia1').textContent = money(transferencia1);
-      document.getElementById('transferencia2').textContent = money(transferencia2);
+      getEl('comun1').textContent = money(comun1);
+      getEl('comun2').textContent = money(comun2);
+      getEl('transferencia1').textContent = money(transferencia1);
+      getEl('transferencia2').textContent = money(transferencia2);
 
       saveState();
     }
@@ -557,11 +563,11 @@
 
     function updateSplitResult() {
       const total = read('split-total');
-      const amountEachEl = document.getElementById('split-amount-each');
-      const detailEl = document.getElementById('split-detail');
-      const remainderEl = document.getElementById('split-remainder');
-      const contextEl = document.getElementById('split-context');
-      const countInput = document.getElementById('split-count');
+      const amountEachEl = getEl('split-amount-each');
+      const detailEl = getEl('split-detail');
+      const remainderEl = getEl('split-remainder');
+      const contextEl = getEl('split-context');
+      const countInput = getEl('split-count');
       if (!countInput) return;
 
       let count = Math.max(1, parseInt(countInput.value, 10) || 1);
@@ -606,15 +612,15 @@
 
     // UI del modo
     function updateModeUI() {
-      const btnProp = document.getElementById('mode-prop');
-      const btnEq = document.getElementById('mode-eq');
-      const hint = document.getElementById('mode-hint');
-      const debtProp = document.getElementById('debt-mode-prop');
-      const debtEq = document.getElementById('debt-mode-eq');
+      const btnProp = getEl('mode-prop');
+      const btnEq = getEl('mode-eq');
+      const hint = getEl('mode-hint');
+      const debtProp = getEl('debt-mode-prop');
+      const debtEq = getEl('debt-mode-eq');
       const debtBaseClass = "debt-mode-btn flex-1 px-3 py-1.5 rounded-lg text-xs font-medium text-center transition-colors whitespace-nowrap";
       const debtActiveExtra = "bg-white text-slate-900 shadow ring-1 ring-[var(--primary)] font-semibold";
       const debtInactiveExtra = "bg-transparent text-slate-600 hover:text-slate-900";
-      const shareActionBtn = document.getElementById('btn-share-action');
+      const shareActionBtn = getEl('btn-share-action');
 
       if (mode === 'prop') {
         btnProp.className = "flex-1 px-3 py-1.5 rounded-lg text-sm font-medium text-center bg-white shadow text-slate-900 ring-1 ring-[var(--primary)]";
@@ -710,8 +716,8 @@
     const remainingAmount = debt => Math.max(0, round2((debt.owedAmount || 0) - totalPaid(debt)));
 
     function renderReimbursements() {
-      const list = document.getElementById('debt-list');
-      const empty = document.getElementById('debt-empty');
+      const list = getEl('debt-list');
+      const empty = getEl('debt-empty');
       if (!list) return;
       if (!reimbursements.length) {
         if (empty) empty.classList.remove('hidden');
@@ -919,10 +925,10 @@
     function updateDebtPreview() {
       const total = read('debt-total');
       const myShare = read('debt-my-share');
-      const installmentsInput = document.getElementById('debt-installments');
+      const installmentsInput = getEl('debt-installments');
       const payer = document.querySelector('input[name="debt-payer"]:checked')?.value || 'me';
-      const preview = document.getElementById('debt-preview');
-      const errorEl = document.getElementById('debt-error');
+      const preview = getEl('debt-preview');
+      const errorEl = getEl('debt-error');
 
       if (errorEl) errorEl.textContent = '';
       if (!preview) return;
@@ -961,7 +967,7 @@
       const total = read('debt-total');
       if (total <= 0) return;
 
-      const myShareInput = document.getElementById('debt-my-share');
+      const myShareInput = getEl('debt-my-share');
       if (!myShareInput) return;
 
       const shareMode = preferredMode || mode;
@@ -982,14 +988,14 @@
 
     function handleAddDebt(event) {
       event.preventDefault();
-      const concept = document.getElementById('debt-concept')?.value.trim();
+      const concept = getEl('debt-concept')?.value.trim();
       const total = read('debt-total');
       const myShare = read('debt-my-share');
-      const installments = Math.max(1, parseInt(document.getElementById('debt-installments')?.value ?? '1', 10) || 1);
-      const firstDate = document.getElementById('debt-first-date')?.value || todayISO();
+      const installments = Math.max(1, parseInt(getEl('debt-installments')?.value ?? '1', 10) || 1);
+      const firstDate = getEl('debt-first-date')?.value || todayISO();
       const payer = document.querySelector('input[name="debt-payer"]:checked')?.value || 'me';
-      const note = document.getElementById('debt-note')?.value.trim();
-      const errorEl = document.getElementById('debt-error');
+      const note = getEl('debt-note')?.value.trim();
+      const errorEl = getEl('debt-error');
 
       if (errorEl) errorEl.textContent = '';
 
@@ -1036,9 +1042,9 @@
       renderReimbursements();
       setActiveTab('reimburse');
 
-      const form = document.getElementById('debt-form');
+      const form = getEl('debt-form');
       form?.reset();
-      const dateInput = document.getElementById('debt-first-date');
+      const dateInput = getEl('debt-first-date');
       if (dateInput) dateInput.value = todayISO();
       const payerInput = document.querySelector('input[name="debt-payer"][value="me"]');
       if (payerInput) payerInput.checked = true;
@@ -1046,16 +1052,16 @@
     }
 
     function initReimbursements() {
-      const form = document.getElementById('debt-form');
+      const form = getEl('debt-form');
       if (!form) return;
-      const dateInput = document.getElementById('debt-first-date');
+      const dateInput = getEl('debt-first-date');
       if (dateInput && !dateInput.value) dateInput.value = todayISO();
 
       ['debt-total', 'debt-my-share', 'debt-installments'].forEach(id => {
-        const el = document.getElementById(id);
+        const el = getEl(id);
         el?.addEventListener('input', updateDebtPreview);
       });
-      document.getElementById('btn-share-action')?.addEventListener('click', () => applyShareShortcut());
+      getEl('btn-share-action')?.addEventListener('click', () => applyShareShortcut());
       document.querySelectorAll('input[name="debt-payer"]').forEach(radio => {
         radio.addEventListener('change', updateDebtPreview);
       });
@@ -1067,8 +1073,8 @@
     }
 
     function setupSplitCalculator() {
-      const totalInput = document.getElementById('split-total');
-      const countInput = document.getElementById('split-count');
+      const totalInput = getEl('split-total');
+      const countInput = getEl('split-count');
       if (!totalInput || !countInput) return;
 
       totalInput.addEventListener('input', updateSplitResult);
@@ -1091,10 +1097,10 @@
       setupTabs();
 
       defaultState = {
-        nomina1: parseFloat(document.getElementById('nomina1').value) || 0,
-        nomina2: parseFloat(document.getElementById('nomina2').value) || 0,
-        fondoComun: parseFloat(document.getElementById('fondoComun').value) || 0,
-        ajuste: parseFloat(document.getElementById('ajuste').value) || 0
+        nomina1: parseFloat(getEl('nomina1').value) || 0,
+        nomina2: parseFloat(getEl('nomina2').value) || 0,
+        fondoComun: parseFloat(getEl('fondoComun').value) || 0,
+        ajuste: parseFloat(getEl('ajuste').value) || 0
       };
 
       loadState();
@@ -1104,25 +1110,25 @@
       const inputs = ['nomina1','nomina2','fondoComun','ajuste'];
       let t;
       inputs.forEach(id => {
-        const el = document.getElementById(id);
+        const el = getEl(id);
         el.addEventListener('input', () => { clearTimeout(t); t = setTimeout(calculate, 80); });
       });
 
-      document.getElementById('btnReset')?.addEventListener('click', () => {
+      getEl('btnReset')?.addEventListener('click', () => {
         try { localStorage.removeItem('parejas_calc'); } catch {}
-        document.getElementById('nomina1').value = defaultState.nomina1 ?? 0;
-        document.getElementById('nomina2').value = defaultState.nomina2 ?? 0;
-        document.getElementById('fondoComun').value = defaultState.fondoComun ?? 0;
-        document.getElementById('ajuste').value = defaultState.ajuste ?? 0;
+        getEl('nomina1').value = defaultState.nomina1 ?? 0;
+        getEl('nomina2').value = defaultState.nomina2 ?? 0;
+        getEl('fondoComun').value = defaultState.fondoComun ?? 0;
+        getEl('ajuste').value = defaultState.ajuste ?? 0;
         mode = 'prop';
         updateModeUI();
         calculate();
       });
 
-      document.getElementById('mode-prop').addEventListener('click', () => setMode('prop'));
-      document.getElementById('mode-eq').addEventListener('click', () => setMode('eq'));
-      document.getElementById('debt-mode-prop')?.addEventListener('click', () => { setMode('prop'); applyShareShortcut('prop'); });
-      document.getElementById('debt-mode-eq')?.addEventListener('click', () => { setMode('eq'); applyShareShortcut('eq'); });
+      getEl('mode-prop').addEventListener('click', () => setMode('prop'));
+      getEl('mode-eq').addEventListener('click', () => setMode('eq'));
+      getEl('debt-mode-prop')?.addEventListener('click', () => { setMode('prop'); applyShareShortcut('prop'); });
+      getEl('debt-mode-eq')?.addEventListener('click', () => { setMode('eq'); applyShareShortcut('eq'); });
 
       initReimbursements();
       setupSplitCalculator();
