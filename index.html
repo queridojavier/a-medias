@@ -49,6 +49,29 @@
   .donut{
     background: conic-gradient(var(--primary) 60%, var(--muted) 0);
   }
+  .tab-button{
+    transition: all .2s ease;
+  }
+  .tab-button-active{
+    background: var(--primary);
+    color: #ffffff;
+    box-shadow: 0 10px 24px rgba(239,125,112,.32);
+  }
+  .chip-button{
+    border-radius: 999px;
+    border: 1px solid #e2e8f0;
+    padding: .25rem .875rem;
+    font-size: .85rem;
+    font-weight: 600;
+    color: #475569;
+    transition: all .2s ease;
+  }
+  .chip-button-active{
+    background: rgba(239,125,112,.15);
+    border-color: var(--primary);
+    color: var(--primary);
+    box-shadow: 0 6px 18px rgba(239,125,112,.2);
+  }
   </style>
 </head>
 
@@ -61,7 +84,28 @@
       <p class="text-slate-600 mt-2">Calculadora rápida para repartir gastos en pareja.</p>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+    <div class="flex justify-center mb-8">
+      <div class="inline-flex bg-white border border-slate-200 rounded-2xl p-1 shadow-sm">
+        <button type="button"
+                class="tab-button px-4 py-2 text-sm font-medium rounded-xl text-slate-600"
+                data-tab-target="calc">
+          División mensual
+        </button>
+        <button type="button"
+                class="tab-button px-4 py-2 text-sm font-medium rounded-xl text-slate-600"
+                data-tab-target="reimburse">
+          Reembolsos
+        </button>
+        <button type="button"
+                class="tab-button px-4 py-2 text-sm font-medium rounded-xl text-slate-600"
+                data-tab-target="split">
+          Divisor rápido
+        </button>
+      </div>
+    </div>
+
+    <section class="tab-section" data-tab-section="calc">
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
       <!-- Columna de Entradas -->
       <div class="lg:col-span-2 space-y-6">
         <div class="card">
@@ -70,14 +114,14 @@
           <!-- Toggle de modo -->
           <div class="mb-5">
             <label class="block text-sm font-medium text-slate-600 mb-2">Modo de reparto</label>
-            <div class="inline-flex rounded-xl bg-slate-100 p-1" role="group" aria-label="Modo de reparto">
+            <div class="flex rounded-xl bg-slate-100 p-1 w-full" role="group" aria-label="Modo de reparto">
               <button id="mode-prop"
-                      class="px-3 py-1.5 rounded-lg text-sm font-medium bg-white shadow text-slate-900 ring-1 ring-[var(--primary)]"
-                      type="button" aria-pressed="true">
+                      class="flex-1 px-3 py-1.5 rounded-lg text-sm font-medium bg-white shadow text-center text-slate-900 ring-1 ring-[var(--primary)]"
+                      type="button" aria-pressed="true" aria-label="Reparto proporcional">
                 Proporcional
               </button>
               <button id="mode-eq"
-                      class="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-700 hover:text-slate-900"
+                      class="flex-1 px-3 py-1.5 rounded-lg text-sm font-medium text-center text-slate-700 hover:text-slate-900"
                       type="button" aria-pressed="false">
                 50 / 50
               </button>
@@ -207,9 +251,164 @@
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <footer class="text-center mt-8 text-sm text-slate-500">
+    <section class="tab-section hidden" data-tab-section="reimburse">
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div class="lg:col-span-2">
+          <div class="card space-y-5" id="debt-form-card">
+            <div>
+              <h2 class="text-xl font-semibold text-slate-700">Reembolso de gastos</h2>
+              <p class="text-sm text-slate-500 mt-1">
+                Registra cuando uno adelanta un pago para el otro y lleva el control de cómo se devuelve.
+              </p>
+            </div>
+            <form id="debt-form" class="space-y-4">
+              <div>
+                <label for="debt-concept" class="block text-sm font-medium text-slate-600 mb-1">Concepto</label>
+                <input type="text" id="debt-concept" class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200" placeholder="Reforma baño, viaje, compra grande..." required>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="debt-total" class="block text-sm font-medium text-slate-600 mb-1">Total pagado</label>
+                  <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
+                    <input type="number" id="debt-total" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200" placeholder="5000" step="0.01" min="0" required>
+                  </div>
+                </div>
+                <div>
+                  <label for="debt-my-share" class="block text-sm font-medium text-slate-600 mb-1">Tu parte del gasto</label>
+                  <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
+                    <input type="number" id="debt-my-share" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200" placeholder="2500" step="0.01" min="0" required>
+                  </div>
+                </div>
+                <div class="sm:col-span-2 sm:col-start-2">
+                  <div class="sm:flex sm:justify-end">
+                    <div class="rounded-2xl bg-slate-100 p-2.5 flex flex-col gap-1.5 w-full sm:max-w-[220px] ml-auto">
+                      <div class="inline-flex rounded-xl bg-white/80 p-0.5 shadow-sm gap-0.5" role="group" aria-label="Modo de reparto rápido en reembolsos">
+                        <button type="button" id="debt-mode-prop" class="debt-mode-btn flex-1 px-2.5 py-1.5 rounded-lg text-[0.7rem] font-semibold text-slate-600 transition-colors text-center whitespace-nowrap" aria-pressed="false" aria-label="Reparto automático">
+                          Auto
+                        </button>
+                        <button type="button" id="debt-mode-eq" class="debt-mode-btn flex-1 px-2.5 py-1.5 rounded-lg text-[0.7rem] font-semibold text-slate-600 transition-colors text-center whitespace-nowrap" aria-pressed="false">
+                          50/50
+                        </button>
+                      </div>
+                      <button type="button" id="btn-share-action" class="text-[0.68rem] font-semibold text-[var(--primary)] hover:text-[var(--primary-700)] focus:outline-none self-start">
+                        Según ingresos
+                      </button>
+                      <p class="text-[0.68rem] text-slate-600 leading-snug">Lo que te corresponde del total. Calculamos el resto automáticamente.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <span class="block text-sm font-medium text-slate-600 mb-1">¿Quién adelantó el pago?</span>
+                <div class="grid grid-cols-2 gap-2">
+                  <label class="flex items-center gap-2 text-sm font-medium text-slate-600 border border-slate-300 rounded-lg px-3 py-2 cursor-pointer hover:border-indigo-500">
+                    <input type="radio" name="debt-payer" value="me" class="text-indigo-600 focus:ring-indigo-500" checked>
+                    Yo
+                  </label>
+                  <label class="flex items-center gap-2 text-sm font-medium text-slate-600 border border-slate-300 rounded-lg px-3 py-2 cursor-pointer hover:border-indigo-500">
+                    <input type="radio" name="debt-payer" value="partner" class="text-indigo-600 focus:ring-indigo-500">
+                    Mi pareja
+                  </label>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="debt-installments" class="block text-sm font-medium text-slate-600 mb-1">Número de cuotas</label>
+                  <input type="number" id="debt-installments" class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200" value="5" min="1" step="1" required>
+                </div>
+                <div>
+                  <label for="debt-first-date" class="block text-sm font-medium text-slate-600 mb-1">Fecha de inicio</label>
+                  <input type="date" id="debt-first-date" class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200">
+                </div>
+              </div>
+
+              <div>
+                <label for="debt-note" class="block text-sm font-medium text-slate-600 mb-1">Notas (opcional)</label>
+                <textarea id="debt-note" rows="2" class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200" placeholder="Detalle extra o condiciones del pago..."></textarea>
+              </div>
+
+              <div class="rounded-xl bg-slate-50 border border-dashed border-slate-300 p-3 text-sm text-slate-600" id="debt-preview">
+                Registra el total y tu parte para calcular cuánto queda pendiente.
+              </div>
+
+              <p id="debt-error" class="text-sm text-rose-600"></p>
+
+              <button type="submit" class="w-full inline-flex justify-center items-center gap-2 rounded-xl bg-[var(--primary)] text-white font-semibold py-2 shadow hover:bg-[var(--primary-700)] transition">
+                Guardar reembolso
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="lg:col-span-3 space-y-4" id="debt-list-wrapper">
+          <div id="debt-empty" class="card text-center text-slate-500 text-sm">
+            <p>Cuando registres un adelanto aparecerá aquí para que lleves el seguimiento de las devoluciones.</p>
+          </div>
+          <div id="debt-list" class="space-y-4"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tab-section hidden" data-tab-section="split">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card space-y-5">
+          <div>
+            <h2 class="text-xl font-semibold text-slate-700">Divisor rápido</h2>
+            <p class="text-sm text-slate-500 mt-1">
+              Divide al instante una cuenta entre dos o más personas para cenas, viajes o compras repentinas.
+            </p>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label for="split-total" class="block text-sm font-medium text-slate-600 mb-1">Importe total</label>
+              <div class="relative">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
+                <input type="number" id="split-total" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100"
+                       placeholder="120" value="60" step="0.01" min="0" inputmode="decimal">
+              </div>
+            </div>
+
+            <div>
+              <span class="block text-sm font-medium text-slate-600 mb-2">Dividir entre</span>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" class="chip-button chip-button-active" data-split-count="2">Pareja (2)</button>
+                <button type="button" class="chip-button" data-split-count="3">3 personas</button>
+                <button type="button" class="chip-button" data-split-count="4">4 personas</button>
+                <button type="button" class="chip-button" data-split-count="6">6 personas</button>
+              </div>
+            </div>
+
+            <div>
+              <label for="split-count" class="block text-sm font-medium text-slate-600 mb-1">¿Cuántas personas?</label>
+              <input type="number" id="split-count" class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100"
+                     value="2" min="1" step="1">
+              <p class="text-xs text-slate-500 mt-1.5">Incluye a todos los que comparten el gasto.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card flex flex-col gap-4 justify-between">
+          <div>
+            <p class="text-xs uppercase tracking-wide text-slate-500 font-semibold mb-2">Cada persona paga</p>
+            <p id="split-amount-each" class="text-4xl font-extrabold text-slate-900">0,00 €</p>
+            <p id="split-context" class="text-sm text-slate-500 mt-1">Divide al instante cualquier gasto.</p>
+          </div>
+          <div class="rounded-xl bg-slate-50 border border-dashed border-slate-200 p-4 text-sm text-slate-600" id="split-detail">
+            Introduce el total y el número de personas para ver el reparto.
+          </div>
+          <p id="split-remainder" class="text-xs text-amber-600"></p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="text-center mt-10 text-sm text-slate-500">
       <p>Creado para una gestión financiera clara y justa.</p>
     </footer>
   </main>
@@ -241,6 +440,16 @@
     const fmtPct = n => new Intl.NumberFormat('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(n);
     const round2 = n => Math.round((Number(n) + Number.EPSILON) * 100) / 100;
 
+    const escapeHtml = str => String(str ?? '').replace(/[&<>"']/g, ch => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    })[ch] || ch);
+    const todayISO = () => new Date().toISOString().slice(0, 10);
+    const uid = () => (window.crypto?.randomUUID?.() ?? `id-${Date.now().toString(36)}-${Math.random().toString(16).slice(2)}`);
+
     const read = (id, { allowNegative = false } = {}) => {
       const el = document.getElementById(id);
       if (!el) return 0;
@@ -252,6 +461,11 @@
     };
 
     // Estado
+    const tabStorageKey = 'a_medias_active_tab';
+    const reimburseKey = 'a_medias_reimbursements';
+    let activeTab = 'calc';
+    let reimbursements = [];
+
     let mode = 'prop'; // 'prop' | 'eq'
     const saveState = () => {
       const data = {
@@ -333,22 +547,100 @@
       saveState();
     }
 
+    function updateSplitChips(activeCount) {
+      document.querySelectorAll('[data-split-count]').forEach(btn => {
+        const target = parseInt(btn.dataset.splitCount, 10);
+        const isActive = target === activeCount;
+        btn.classList.toggle('chip-button-active', isActive);
+      });
+    }
+
+    function updateSplitResult() {
+      const total = read('split-total');
+      const amountEachEl = document.getElementById('split-amount-each');
+      const detailEl = document.getElementById('split-detail');
+      const remainderEl = document.getElementById('split-remainder');
+      const contextEl = document.getElementById('split-context');
+      const countInput = document.getElementById('split-count');
+      if (!countInput) return;
+
+      let count = Math.max(1, parseInt(countInput.value, 10) || 1);
+      countInput.value = count;
+
+      const totalCents = Math.round(total * 100);
+      const baseCents = count ? Math.floor(totalCents / count) : 0;
+      const remainder = count ? totalCents - baseCents * count : 0;
+      const higherCents = baseCents + (remainder > 0 ? 1 : 0);
+
+      if (amountEachEl) {
+        const avg = count > 0 ? round2(total / count) : 0;
+        amountEachEl.textContent = money(avg);
+      }
+
+      if (detailEl) {
+        if (total <= 0) {
+          detailEl.textContent = 'Introduce un importe para calcular el reparto.';
+        } else if (remainder === 0) {
+          detailEl.textContent = `Todos pagan ${money(baseCents / 100)} para cubrir ${money(total)}.`;
+        } else {
+          const higherPeople = remainder;
+          const lowerPeople = count - remainder;
+          detailEl.textContent = `${higherPeople} ${(higherPeople === 1 ? 'persona' : 'personas')} pagan ${money(higherCents / 100)} y ${lowerPeople} ${(lowerPeople === 1 ? 'persona' : 'personas')} pagan ${money(baseCents / 100)} para llegar a ${money(total)}.`;
+        }
+      }
+
+      if (remainderEl) {
+        remainderEl.textContent = remainder === 0
+          ? ''
+          : 'Distribuimos los céntimos sobrantes para que el total encaje al céntimo.';
+      }
+
+      if (contextEl) {
+        contextEl.textContent = count === 2
+          ? 'Ideal para dividir un gasto entre tu pareja y tú.'
+          : `Dividiendo entre ${count} personas.`;
+      }
+
+      updateSplitChips(count);
+    }
+
     // UI del modo
     function updateModeUI() {
       const btnProp = document.getElementById('mode-prop');
       const btnEq = document.getElementById('mode-eq');
       const hint = document.getElementById('mode-hint');
+      const debtProp = document.getElementById('debt-mode-prop');
+      const debtEq = document.getElementById('debt-mode-eq');
+      const debtBaseClass = "debt-mode-btn flex-1 px-3 py-1.5 rounded-lg text-xs font-medium text-center transition-colors whitespace-nowrap";
+      const debtActiveExtra = "bg-white text-slate-900 shadow ring-1 ring-[var(--primary)] font-semibold";
+      const debtInactiveExtra = "bg-transparent text-slate-600 hover:text-slate-900";
+      const shareActionBtn = document.getElementById('btn-share-action');
 
       if (mode === 'prop') {
-        btnProp.className = "px-3 py-1.5 rounded-lg text-sm font-medium bg-white shadow text-slate-900 ring-1 ring-[var(--primary)]";
-        btnEq.className = "px-3 py-1.5 rounded-lg text-sm font-medium text-slate-700 hover:text-slate-900";
+        btnProp.className = "flex-1 px-3 py-1.5 rounded-lg text-sm font-medium text-center bg-white shadow text-slate-900 ring-1 ring-[var(--primary)]";
+        btnEq.className = "flex-1 px-3 py-1.5 rounded-lg text-sm font-medium text-center text-slate-700 hover:text-slate-900";
         btnProp.setAttribute('aria-pressed','true'); btnEq.setAttribute('aria-pressed','false');
-        hint.textContent = "Reparte según el peso de cada nómina.";
+        if (hint) hint.textContent = "Reparte según el peso de cada nómina.";
+        if (debtProp && debtEq) {
+          debtProp.className = `${debtBaseClass} ${debtActiveExtra}`;
+          debtEq.className = `${debtBaseClass} ${debtInactiveExtra}`;
+          debtProp.setAttribute('aria-pressed','true');
+          debtEq.setAttribute('aria-pressed','false');
+        }
       } else {
-        btnEq.className = "px-3 py-1.5 rounded-lg text-sm font-medium bg-white shadow text-slate-900 ring-1 ring-[var(--primary)]";
-        btnProp.className = "px-3 py-1.5 rounded-lg text-sm font-medium text-slate-700 hover:text-slate-900";
+        btnEq.className = "flex-1 px-3 py-1.5 rounded-lg text-sm font-medium text-center bg-white shadow text-slate-900 ring-1 ring-[var(--primary)]";
+        btnProp.className = "flex-1 px-3 py-1.5 rounded-lg text-sm font-medium text-center text-slate-700 hover:text-slate-900";
         btnEq.setAttribute('aria-pressed','true'); btnProp.setAttribute('aria-pressed','false');
-        hint.textContent = "Reparte exactamente al 50% cada concepto.";
+        if (hint) hint.textContent = "Reparte exactamente al 50% cada concepto.";
+        if (debtProp && debtEq) {
+          debtEq.className = `${debtBaseClass} ${debtActiveExtra}`;
+          debtProp.className = `${debtBaseClass} ${debtInactiveExtra}`;
+          debtEq.setAttribute('aria-pressed','true');
+          debtProp.setAttribute('aria-pressed','false');
+        }
+      }
+      if (shareActionBtn) {
+        shareActionBtn.textContent = mode === 'prop' ? 'Según ingresos' : 'Divide al 50%';
       }
     }
 
@@ -358,9 +650,446 @@
       calculate();
     }
 
+    function setActiveTab(tabId) {
+      activeTab = tabId;
+      document.querySelectorAll('[data-tab-section]').forEach(section => {
+        const isActive = section.dataset.tabSection === tabId;
+        section.classList.toggle('hidden', !isActive);
+      });
+      document.querySelectorAll('[data-tab-target]').forEach(btn => {
+        const isActive = btn.dataset.tabTarget === tabId;
+        btn.classList.toggle('tab-button-active', isActive);
+        btn.classList.toggle('text-slate-900', isActive);
+        btn.classList.toggle('text-slate-600', !isActive);
+      });
+      try { localStorage.setItem(tabStorageKey, tabId); } catch {}
+    }
+
+    function setupTabs() {
+      const buttons = document.querySelectorAll('[data-tab-target]');
+      if (!buttons.length) return;
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => setActiveTab(btn.dataset.tabTarget));
+      });
+      let stored = 'calc';
+      try {
+        const raw = localStorage.getItem(tabStorageKey);
+        if (raw && document.querySelector(`[data-tab-section="${raw}"]`)) stored = raw;
+      } catch {}
+      setActiveTab(stored);
+    }
+
+    const loadReimbursements = () => {
+      try {
+        const raw = JSON.parse(localStorage.getItem(reimburseKey) || '[]');
+        if (Array.isArray(raw)) {
+          reimbursements = raw.map(item => ({
+            payments: [],
+            ...item,
+            total: round2(item.total ?? 0),
+            myShare: round2(item.myShare ?? 0),
+            partnerShare: round2(item.partnerShare ?? 0),
+            owedAmount: round2(item.owedAmount ?? 0),
+            installments: Math.max(1, parseInt(item.installments ?? 1, 10) || 1),
+            installmentAmount: round2(item.installmentAmount ?? (item.owedAmount ?? 0)),
+            createdAt: item.createdAt || new Date().toISOString()
+          }));
+        }
+      } catch {
+        reimbursements = [];
+      }
+    };
+
+    const saveReimbursements = () => {
+      try {
+        localStorage.setItem(reimburseKey, JSON.stringify(reimbursements));
+      } catch {}
+    };
+
+    const totalPaid = debt => round2((debt.payments || []).reduce((acc, p) => acc + (Number(p.amount) || 0), 0));
+    const remainingAmount = debt => Math.max(0, round2((debt.owedAmount || 0) - totalPaid(debt)));
+
+    function renderReimbursements() {
+      const list = document.getElementById('debt-list');
+      const empty = document.getElementById('debt-empty');
+      if (!list) return;
+      if (!reimbursements.length) {
+        if (empty) empty.classList.remove('hidden');
+        list.innerHTML = '';
+        return;
+      }
+      if (empty) empty.classList.add('hidden');
+
+      list.innerHTML = reimbursements.map(debt => {
+        const paid = totalPaid(debt);
+        const pending = remainingAmount(debt);
+        const pct = debt.owedAmount > 0 ? Math.min(100, Math.round((paid / debt.owedAmount) * 100)) : 100;
+        const payerLabel = debt.payer === 'me' ? 'Tú' : 'Tu pareja';
+        const owedLabel = debt.owedBy === 'partner' ? 'Tu pareja te debe' : 'Le debes a tu pareja';
+        const installmentsLabel = debt.installments > 1
+          ? `${debt.installments} cuotas aprox. de ${money(debt.installmentAmount)}`
+          : 'Pago único';
+        const paymentsList = (debt.payments || []).length
+          ? debt.payments.map(p => `
+              <li class="flex justify-between gap-3 py-1 border-b border-slate-100 last:border-0 text-sm">
+                <div>
+                  <span class="font-medium text-slate-700">${money(p.amount)}</span>
+                  ${p.note ? `<span class="text-xs text-slate-500 block">${escapeHtml(p.note)}</span>` : ''}
+                </div>
+                <span class="text-xs text-slate-500 whitespace-nowrap">${escapeHtml(p.date || '')}</span>
+              </li>
+            `).join('')
+          : '<li class="text-sm text-slate-500 italic">Aún no hay pagos registrados.</li>';
+
+        return `
+          <article class="card space-y-4" data-debt-id="${escapeHtml(debt.id)}">
+            <header class="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+              <div>
+                <h3 class="text-lg font-semibold text-slate-800">${escapeHtml(debt.concept)}</h3>
+                <p class="text-sm text-slate-500">Pagó: ${payerLabel} · ${installmentsLabel}</p>
+                ${debt.note ? `<p class="mt-1 text-xs text-slate-500">${escapeHtml(debt.note)}</p>` : ''}
+              </div>
+              <div class="text-right">
+                <p class="text-sm text-slate-500">Total</p>
+                <p class="text-2xl font-semibold text-slate-800">${money(debt.total)}</p>
+              </div>
+            </header>
+            <div class="flex flex-wrap gap-2 md:justify-end">
+              <button type="button" class="inline-flex items-center gap-1 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-emerald-400 hover:text-emerald-600 transition"
+                      data-debt-action="settle" data-debt-id="${escapeHtml(debt.id)}">
+                Liquidar deuda
+              </button>
+              <button type="button" class="inline-flex items-center gap-1 rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-medium text-rose-600 bg-rose-50 hover:bg-rose-100 transition"
+                      data-debt-action="delete" data-debt-id="${escapeHtml(debt.id)}">
+                Eliminar
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+              <div class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+                <p class="text-slate-500">Tu parte</p>
+                <p class="font-semibold text-slate-800">${money(debt.myShare)}</p>
+              </div>
+              <div class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
+                <p class="text-slate-500">Parte pareja</p>
+                <p class="font-semibold text-slate-800">${money(debt.partnerShare)}</p>
+              </div>
+              <div class="rounded-lg border border-slate-200 px-3 py-2 ${pending === 0 ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}">
+                <p class="text-slate-500">${owedLabel}</p>
+                <p class="font-semibold ${pending === 0 ? 'text-emerald-700' : 'text-amber-700'}">${pending === 0 ? 'Liquidado' : money(pending)}</p>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex items-center justify-between text-sm text-slate-500 mb-1">
+                <span>Progreso de devolución</span>
+                <span>${pct}%</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
+                <div class="h-full bg-[var(--primary)] transition-all" style="width:${pct}%;"></div>
+              </div>
+            </div>
+
+            <section class="space-y-2">
+              <h4 class="text-sm font-semibold text-slate-600 uppercase tracking-wide">Historial</h4>
+              <ul class="divide-y divide-slate-100 rounded-lg border border-slate-200 bg-white overflow-hidden">
+                ${paymentsList}
+              </ul>
+            </section>
+
+            <form class="payment-form grid gap-3 md:grid-cols-[repeat(auto-fit,minmax(140px,1fr))]" data-debt-id="${escapeHtml(debt.id)}">
+              <div class="md:col-span-1">
+                <label class="text-xs text-slate-500 block mb-1">Importe</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">€</span>
+                  <input name="amount" type="number" step="0.01" min="0" class="pl-7 w-full rounded-lg border border-slate-300 py-2 px-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200" placeholder="250">
+                </div>
+              </div>
+              <div>
+                <label class="text-xs text-slate-500 block mb-1">Fecha</label>
+                <input name="date" type="date" class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200" value="${todayISO()}">
+              </div>
+              <div class="md:col-span-2">
+                <label class="text-xs text-slate-500 block mb-1">Nota (opcional)</label>
+                <input name="note" type="text" class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200" placeholder="Bizum 1/5, transferencia, efectivo...">
+              </div>
+              <div class="md:col-span-full flex flex-col gap-2 sm:flex-row sm:items-center">
+                <button type="submit" class="inline-flex justify-center rounded-lg bg-emerald-500 text-white font-semibold px-4 py-2 shadow hover:bg-emerald-600 transition">
+                  Registrar pago
+                </button>
+                <p class="payment-error text-xs text-rose-600"></p>
+              </div>
+            </form>
+          </article>
+        `;
+      }).join('');
+
+      attachPaymentHandlers();
+      attachDebtActionHandlers();
+    }
+
+    function attachPaymentHandlers() {
+      document.querySelectorAll('.payment-form').forEach(form => {
+        form.addEventListener('submit', handlePaymentSubmit);
+      });
+    }
+
+    function handlePaymentSubmit(event) {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const debtId = form.dataset.debtId;
+      const amountInput = form.elements.amount;
+      const dateInput = form.elements.date;
+      const noteInput = form.elements.note;
+      const errorEl = form.querySelector('.payment-error');
+      if (errorEl) errorEl.textContent = '';
+
+      const amount = parseFloat(String(amountInput.value || '').replace(',', '.')) || 0;
+      if (amount <= 0) {
+        if (errorEl) errorEl.textContent = 'Introduce un importe válido.';
+        return;
+      }
+
+      const debt = reimbursements.find(d => d.id === debtId);
+      if (!debt) {
+        if (errorEl) errorEl.textContent = 'No se encontró el reembolso.';
+        return;
+      }
+
+      const remaining = remainingAmount(debt);
+      if (amount > remaining + 0.01) {
+        if (errorEl) errorEl.textContent = 'El pago supera lo pendiente.';
+        return;
+      }
+
+      const payment = {
+        id: uid(),
+        amount: round2(amount),
+        date: dateInput.value || todayISO(),
+        note: noteInput.value.trim()
+      };
+
+      debt.payments = debt.payments || [];
+      debt.payments.push(payment);
+
+      saveReimbursements();
+      renderReimbursements();
+    }
+
+    function attachDebtActionHandlers() {
+      document.querySelectorAll('[data-debt-action]').forEach(btn => {
+        btn.addEventListener('click', handleDebtAction);
+      });
+    }
+
+    function handleDebtAction(event) {
+      const btn = event.currentTarget;
+      const { debtId, debtAction } = btn.dataset;
+      const debt = reimbursements.find(d => d.id === debtId);
+      if (!debt) return;
+
+      if (debtAction === 'delete') {
+        if (!confirm('¿Seguro que quieres eliminar este reembolso?')) return;
+        reimbursements = reimbursements.filter(d => d.id !== debtId);
+        saveReimbursements();
+        renderReimbursements();
+        return;
+      }
+
+      if (debtAction === 'settle') {
+        const pending = remainingAmount(debt);
+        if (pending <= 0.01) {
+          alert('Este reembolso ya está liquidado.');
+          return;
+        }
+        if (!confirm(`Se registrará un pago final de ${money(pending)} para liquidar la deuda. ¿Continuar?`)) return;
+        const payment = {
+          id: uid(),
+          amount: round2(pending),
+          date: todayISO(),
+          note: 'Liquidación manual'
+        };
+        debt.payments = debt.payments || [];
+        debt.payments.push(payment);
+        saveReimbursements();
+        renderReimbursements();
+      }
+    }
+
+    function updateDebtPreview() {
+      const total = read('debt-total');
+      const myShare = read('debt-my-share');
+      const installmentsInput = document.getElementById('debt-installments');
+      const payer = document.querySelector('input[name="debt-payer"]:checked')?.value || 'me';
+      const preview = document.getElementById('debt-preview');
+      const errorEl = document.getElementById('debt-error');
+
+      if (errorEl) errorEl.textContent = '';
+      if (!preview) return;
+
+      if (!total && !myShare) {
+        preview.textContent = 'Registra el total y tu parte para calcular cuánto queda pendiente.';
+        return;
+      }
+
+      if (myShare > total) {
+        preview.textContent = 'Tu parte no puede ser mayor que el total del gasto.';
+        return;
+      }
+
+      const partnerShare = round2(Math.max(0, total - myShare));
+      const installments = Math.max(1, parseInt(installmentsInput?.value ?? '1', 10) || 1);
+      const owedAmount = payer === 'me' ? partnerShare : myShare;
+      const installmentAmount = installments > 0 ? round2(owedAmount / installments) : owedAmount;
+
+      const direction = payer === 'me'
+        ? `Tu pareja te devolverá ${money(owedAmount)}`
+        : `Devolverás ${money(owedAmount)} a tu pareja`;
+      const cuotaText = installments > 1
+        ? `en ${installments} cuotas aproximadas de ${money(installmentAmount)}`
+        : 'en un solo pago';
+
+      preview.innerHTML = `
+        <div class="flex flex-col gap-1">
+          <span>Tu parte: <strong>${money(myShare)}</strong> · Parte pareja: <strong>${money(partnerShare)}</strong></span>
+          <span>${direction} ${cuotaText}.</span>
+        </div>
+      `;
+    }
+
+    function applyShareShortcut(preferredMode) {
+      const total = read('debt-total');
+      if (total <= 0) return;
+
+      const myShareInput = document.getElementById('debt-my-share');
+      if (!myShareInput) return;
+
+      const shareMode = preferredMode || mode;
+      let proportion = 0.5;
+      if (shareMode === 'prop') {
+        const nomina1 = read('nomina1');
+        const nomina2 = read('nomina2');
+        const ingresoTotal = nomina1 + nomina2;
+        if (ingresoTotal > 0) {
+          proportion = Math.min(1, Math.max(0, nomina1 / ingresoTotal));
+        }
+      }
+
+      const computedShare = Math.min(total, round2(total * proportion));
+      myShareInput.value = computedShare;
+      updateDebtPreview();
+    }
+
+    function handleAddDebt(event) {
+      event.preventDefault();
+      const concept = document.getElementById('debt-concept')?.value.trim();
+      const total = read('debt-total');
+      const myShare = read('debt-my-share');
+      const installments = Math.max(1, parseInt(document.getElementById('debt-installments')?.value ?? '1', 10) || 1);
+      const firstDate = document.getElementById('debt-first-date')?.value || todayISO();
+      const payer = document.querySelector('input[name="debt-payer"]:checked')?.value || 'me';
+      const note = document.getElementById('debt-note')?.value.trim();
+      const errorEl = document.getElementById('debt-error');
+
+      if (errorEl) errorEl.textContent = '';
+
+      if (!concept) {
+        if (errorEl) errorEl.textContent = 'Añade un concepto para identificar el gasto.';
+        return;
+      }
+      if (total <= 0) {
+        if (errorEl) errorEl.textContent = 'El total debe ser mayor que cero.';
+        return;
+      }
+      if (myShare < 0 || myShare > total) {
+        if (errorEl) errorEl.textContent = 'Tu parte debe estar entre 0 y el total.';
+        return;
+      }
+
+      const partnerShare = round2(Math.max(0, total - myShare));
+      const owedAmount = payer === 'me' ? partnerShare : myShare;
+
+      if (owedAmount <= 0) {
+        if (errorEl) errorEl.textContent = 'No hay importe pendiente de devolver.';
+        return;
+      }
+
+      const debt = {
+        id: uid(),
+        concept,
+        total: round2(total),
+        myShare: round2(myShare),
+        partnerShare,
+        payer,
+        owedBy: payer === 'me' ? 'partner' : 'me',
+        owedAmount: round2(owedAmount),
+        installments,
+        installmentAmount: round2(owedAmount / installments),
+        note,
+        createdAt: new Date().toISOString(),
+        firstDate,
+        payments: []
+      };
+
+      reimbursements.unshift(debt);
+      saveReimbursements();
+      renderReimbursements();
+      setActiveTab('reimburse');
+
+      const form = document.getElementById('debt-form');
+      form?.reset();
+      const dateInput = document.getElementById('debt-first-date');
+      if (dateInput) dateInput.value = todayISO();
+      const payerInput = document.querySelector('input[name="debt-payer"][value="me"]');
+      if (payerInput) payerInput.checked = true;
+      updateDebtPreview();
+    }
+
+    function initReimbursements() {
+      const form = document.getElementById('debt-form');
+      if (!form) return;
+      const dateInput = document.getElementById('debt-first-date');
+      if (dateInput && !dateInput.value) dateInput.value = todayISO();
+
+      ['debt-total', 'debt-my-share', 'debt-installments'].forEach(id => {
+        const el = document.getElementById(id);
+        el?.addEventListener('input', updateDebtPreview);
+      });
+      document.getElementById('btn-share-action')?.addEventListener('click', () => applyShareShortcut());
+      document.querySelectorAll('input[name="debt-payer"]').forEach(radio => {
+        radio.addEventListener('change', updateDebtPreview);
+      });
+      form.addEventListener('submit', handleAddDebt);
+
+      loadReimbursements();
+      renderReimbursements();
+      updateDebtPreview();
+    }
+
+    function setupSplitCalculator() {
+      const totalInput = document.getElementById('split-total');
+      const countInput = document.getElementById('split-count');
+      if (!totalInput || !countInput) return;
+
+      totalInput.addEventListener('input', updateSplitResult);
+      countInput.addEventListener('input', updateSplitResult);
+
+      document.querySelectorAll('[data-split-count]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const target = parseInt(btn.dataset.splitCount, 10) || 2;
+          countInput.value = target;
+          updateSplitResult();
+        });
+      });
+
+      updateSplitResult();
+    }
+
     // Bootstrap
     let defaultState = {};
     window.onload = () => {
+      setupTabs();
+
       defaultState = {
         nomina1: parseFloat(document.getElementById('nomina1').value) || 0,
         nomina2: parseFloat(document.getElementById('nomina2').value) || 0,
@@ -392,6 +1121,11 @@
 
       document.getElementById('mode-prop').addEventListener('click', () => setMode('prop'));
       document.getElementById('mode-eq').addEventListener('click', () => setMode('eq'));
+      document.getElementById('debt-mode-prop')?.addEventListener('click', () => { setMode('prop'); applyShareShortcut('prop'); });
+      document.getElementById('debt-mode-eq')?.addEventListener('click', () => { setMode('eq'); applyShareShortcut('eq'); });
+
+      initReimbursements();
+      setupSplitCalculator();
     };
   </script>
 </body>
