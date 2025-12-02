@@ -1,10 +1,19 @@
-const CACHE = 'finanzas-v4';
+const CACHE = 'a-medias-v2.0';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-512.png',
+  './css/styles.css',
+  './js/constants.js',
+  './js/utils.js',
+  './js/toast.js',
+  './js/sync.js',
+  './js/calculator.js',
+  './js/reimbursements.js',
+  './js/split.js',
+  './js/app.js'
 ];
 
 // CDNs permitidos para cache runtime

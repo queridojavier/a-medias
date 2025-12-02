@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>A Medias</title>
+  <title>A Medias - Calculadora de gastos en pareja</title>
 
   <!-- Tailwind por CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -19,64 +19,25 @@
   <meta name="theme-color" content="#EF7D70">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Calculadora para dividir gastos en pareja de forma justa y transparente">
 
-  <!-- Estilo de marca y tarjetas -->
-  <style>
-    :root{
-      --primary:#EF7D70;      /* salmón */
-      --primary-700:#E15F54;
-      --ink:#0f172a;
-      --muted:#e5e7eb;
-      --card:#ffffff;
-      --bg:#f7f8fb;
-    }
-    body{ font-family:'Inter',system-ui,sans-serif; background: var(--bg); }
-    .card{
-      background:var(--card);
-      border-radius:16px;
-      border:1px solid #e6e8ef;
-      box-shadow:0 8px 24px rgba(15,23,42,.06);
-      padding:1.25rem;
-    }
-    .result-box{ border-radius:16px; padding:1.25rem; text-align:center; }
-    .brand-dot{ width:.7rem; height:.7rem; border-radius:999px; display:inline-block; }
-      .badge-success{
-    background: rgba(16,185,129,.14);
-    color: #0f7a4e;
-    padding: .15rem .5rem;
-    border-radius: .5rem;
-  }
-  .donut{
-    background: conic-gradient(var(--primary) 60%, var(--muted) 0);
-  }
-  .tab-button{
-    transition: all .2s ease;
-  }
-  .tab-button-active{
-    background: var(--primary);
-    color: #ffffff;
-    box-shadow: 0 10px 24px rgba(239,125,112,.32);
-  }
-  .chip-button{
-    border-radius: 999px;
-    border: 1px solid #e2e8f0;
-    padding: .25rem .875rem;
-    font-size: .85rem;
-    font-weight: 600;
-    color: #475569;
-    transition: all .2s ease;
-  }
-  .chip-button-active{
-    background: rgba(239,125,112,.15);
-    border-color: var(--primary);
-    color: var(--primary);
-    box-shadow: 0 6px 18px rgba(239,125,112,.2);
-  }
-  </style>
+  <!-- Estilos -->
+  <link rel="stylesheet" href="./css/styles.css">
 </head>
 
 <body class="text-slate-800 flex items-center justify-center min-h-screen p-4">
+  <!-- Indicador de offline -->
+  <div id="offline-banner" class="offline-banner">
+    Sin conexión a internet. Los cambios se sincronizarán cuando vuelvas online.
+  </div>
+
+  <!-- Indicador de sincronización (flotante, opcional) -->
+  <div id="sync-indicator" class="sync-indicator idle hidden" style="position: fixed; bottom: 1rem; right: 1rem; z-index: 40;">
+    <span>Local</span>
+  </div>
+
   <main class="w-full max-w-4xl mx-auto">
+    <!-- Cabecera -->
     <div class="text-center mb-8">
       <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight" style="color:var(--ink)">
         A <span style="color:var(--primary)">Medias</span>
@@ -84,6 +45,7 @@
       <p class="text-slate-600 mt-2">Calculadora rápida para repartir gastos en pareja.</p>
     </div>
 
+    <!-- Tabs de navegación -->
     <div class="flex justify-center mb-8">
       <div class="inline-flex bg-white border border-slate-200 rounded-2xl p-1 shadow-sm">
         <button type="button"
@@ -104,155 +66,197 @@
       </div>
     </div>
 
-    <section class="tab-section" data-tab-section="calc">
-      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
-      <!-- Columna de Entradas -->
-      <div class="lg:col-span-2 space-y-6">
-        <div class="card">
-          <h2 class="text-xl font-semibold mb-4 text-slate-700">1. Datos del Mes</h2>
-
-          <!-- Toggle de modo -->
-          <div class="mb-5">
-            <label class="block text-sm font-medium text-slate-600 mb-2">Modo de reparto</label>
-            <div class="flex rounded-xl bg-slate-100 p-1 w-full" role="group" aria-label="Modo de reparto">
-              <button id="mode-prop"
-                      class="flex-1 px-3 py-1.5 rounded-lg text-sm font-medium bg-white shadow text-center text-slate-900 ring-1 ring-[var(--primary)]"
-                      type="button" aria-pressed="true" aria-label="Reparto proporcional">
-                Proporcional
-              </button>
-              <button id="mode-eq"
-                      class="flex-1 px-3 py-1.5 rounded-lg text-sm font-medium text-center text-slate-700 hover:text-slate-900"
-                      type="button" aria-pressed="false">
-                50 / 50
-              </button>
-            </div>
-            <p id="mode-hint" class="text-xs text-slate-500 mt-2">Reparte según el peso de cada nómina.</p>
-          </div>
-
-          <!-- Ingresos -->
-          <div class="space-y-4">
-            <div>
-              <label for="nomina1" class="block text-sm font-medium text-slate-600 mb-1">Tu nómina</label>
-              <div class="relative">
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
-                <input type="number" id="nomina1" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
-                       placeholder="1800" value="1800" step="0.01" inputmode="decimal" min="0">
-              </div>
-            </div>
-            <div>
-              <label for="nomina2" class="block text-sm font-medium text-slate-600 mb-1">Nómina de tu pareja</label>
-              <div class="relative">
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
-                <input type="number" id="nomina2" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
-                       placeholder="1500" value="1500" step="0.01" inputmode="decimal" min="0">
-              </div>
-            </div>
-          </div>
-
-          <!-- Fondo común y ajuste -->
-          <div class="mt-6 pt-6 border-t border-slate-200 space-y-4">
-            <div>
-              <label for="fondoComun" class="block text-sm font-medium text-slate-600 mb-1">Aportación a la cuenta común</label>
-              <div class="relative">
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
-                <input type="number" id="fondoComun" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
-                       placeholder="1200" value="1200" step="0.01" inputmode="decimal" min="0">
-              </div>
-            </div>
-            <div>
-              <label for="ajuste" class="block text-sm font-medium text-slate-600 mb-1">Ajuste entre vosotros</label>
-              <div class="relative">
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
-                <input type="number" id="ajuste" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
-                       placeholder="0" value="0" step="0.01" inputmode="decimal">
-              </div>
-              <p class="text-xs text-slate-500 mt-1.5">Positivo si te deben a ti, negativo si debes tú.</p>
-            </div>
-          </div>
-
-          <!-- Acciones -->
-          <div class="mt-6 flex items-center gap-3">
-            <button id="btnReset"
-                    class="px-3 py-2 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-sm">
-              Restablecer valores
-            </button>
-          </div>
+    <!-- Card de compartir/sincronizar -->
+    <section class="card mb-8" id="share-card">
+      <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+        <div class="space-y-1">
+          <h2 class="text-lg font-semibold text-slate-700">Sincroniza con tu pareja</h2>
+          <p class="text-sm text-slate-500" id="share-card-description">
+            Crea un enlace privado para que tus datos se guarden en la nube y se actualicen en otros dispositivos.
+          </p>
+          <p class="text-xs text-slate-500" id="share-status-text">Guardado solo en este dispositivo.</p>
+          <p class="text-xs text-rose-600 hidden" id="share-missing-config">
+            Añade tus credenciales de Supabase en <code>config.js</code> para activar la sincronización segura.
+          </p>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+          <button type="button" id="share-create" class="inline-flex justify-center items-center rounded-xl bg-[var(--primary)] text-white font-semibold py-2 px-4 shadow hover:bg-[var(--primary-700)] transition">
+            Crear enlace seguro
+          </button>
+          <button type="button" id="share-copy" class="hidden inline-flex justify-center items-center rounded-xl border border-slate-300 text-slate-700 font-semibold py-2 px-4 hover:border-slate-400 transition bg-white">
+            Copiar enlace
+          </button>
+          <button type="button" id="share-leave" class="hidden inline-flex justify-center items-center rounded-xl border border-slate-200 text-slate-600 font-semibold py-2 px-4 hover:border-slate-400 transition bg-white">
+            Salir del enlace
+          </button>
         </div>
       </div>
+      <div id="share-link-wrapper" class="mt-4 hidden">
+        <label for="share-link-input" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Enlace compartido</label>
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <input type="text" id="share-link-input" readonly class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm bg-slate-50 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200" value="">
+          <button type="button" id="share-copy-secondary" class="inline-flex justify-center items-center rounded-xl border border-slate-300 text-slate-700 font-semibold py-2 px-4 hover:border-slate-400 transition bg-white">
+            Copiar enlace
+          </button>
+        </div>
+        <p class="text-xs text-slate-500 mt-2">
+          Solo quien tenga este enlace podrá ver y editar estos datos. Para dejar de compartir, vuelve a esta página y usa "Salir del enlace".
+        </p>
+      </div>
+    </section>
 
-      <!-- Columna de Resultados -->
-      <div class="lg:col-span-3 space-y-6">
-        <div class="card" aria-live="polite">
-          <h2 class="text-xl font-semibold mb-4 text-slate-700">2. Resumen y reparto</h2>
+    <!-- TAB: División mensual -->
+    <section class="tab-section" data-tab-section="calc">
+      <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <!-- Columna de Entradas -->
+        <div class="lg:col-span-2 space-y-6">
+          <div class="card">
+            <h2 class="text-xl font-semibold mb-4 text-slate-700">1. Datos del Mes</h2>
 
-          <div class="space-y-3 text-slate-600">
-            <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
-              <span class="font-medium">Ingresos totales:</span>
-              <span id="ingresoTotal" class="font-bold text-lg text-slate-800">3.300,00 €</span>
+            <!-- Toggle de modo -->
+            <div class="mb-5">
+              <label class="block text-sm font-medium text-slate-600 mb-2">Modo de reparto</label>
+              <div class="flex rounded-xl bg-slate-100 p-1 w-full" role="group" aria-label="Modo de reparto">
+                <button id="mode-prop"
+                        class="flex-1 px-3 py-1.5 rounded-lg text-sm font-medium bg-white shadow text-center text-slate-900 ring-1 ring-[var(--primary)]"
+                        type="button" aria-pressed="true" aria-label="Reparto proporcional">
+                  Proporcional
+                </button>
+                <button id="mode-eq"
+                        class="flex-1 px-3 py-1.5 rounded-lg text-sm font-medium text-center text-slate-700 hover:text-slate-900"
+                        type="button" aria-pressed="false">
+                  50 / 50
+                </button>
+              </div>
+              <p id="mode-hint" class="text-xs text-slate-500 mt-2">Reparte según el peso de cada nómina.</p>
             </div>
-            <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
-              <span class="font-medium">Dinero a repartir:</span>
-              <span id="dineroRepartir" class="badge-success font-bold text-lg">2.100,00 €</span>
-            </div>
 
-            <!-- Donut + leyenda -->
-            <div class="mt-4 pt-4 border-t border-slate-200">
-              <h3 class="font-semibold text-center mb-3">Distribución</h3>
-              <div class="flex items-center justify-center gap-6">
-                <!-- Donut -->
-                <div class="relative w-36 h-36 rounded-full donut" id="donut" aria-label="Distribución de aportación">
-  <div class="absolute inset-6 rounded-full bg-white ring-1 ring-[#e6e8ef]"></div>
-  <div class="absolute inset-0 grid place-items-center">
-    <span id="p1Center" class="font-extrabold text-2xl" style="color:var(--ink)">60%</span>
-  </div>
-</div>
-                <!-- Leyenda -->
-                <ul class="text-sm text-slate-600">
-                  <li class="mb-2">
-                    <span class="brand-dot" style="background:var(--primary)"></span>
-                    <span class="font-medium text-slate-700">Tu parte</span>:
-                    <span id="porcentaje1" class="font-semibold">60%</span>
-                  </li>
-                  <li>
-                    <span class="brand-dot" style="background:var(--muted); border:1px solid #cdd1d8"></span>
-                    <span class="font-medium text-slate-700">Pareja</span>:
-                    <span id="porcentaje2" class="font-semibold">40%</span>
-                  </li>
-                </ul>
+            <!-- Ingresos -->
+            <div class="space-y-4">
+              <div>
+                <label for="nomina1" class="block text-sm font-medium text-slate-600 mb-1">Tu nómina</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
+                  <input type="number" id="nomina1" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
+                         placeholder="1800" value="1800" step="0.01" inputmode="decimal" min="0">
+                </div>
+              </div>
+              <div>
+                <label for="nomina2" class="block text-sm font-medium text-slate-600 mb-1">Nómina de tu pareja</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
+                  <input type="number" id="nomina2" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
+                         placeholder="1500" value="1500" step="0.01" inputmode="decimal" min="0">
+                </div>
               </div>
             </div>
 
-            <!-- Aportaciones al fondo -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 text-sm text-slate-600">
-              <div class="p-3 bg-slate-50 rounded-lg">
-                <span class="font-medium">Tu aportación al fondo:</span> <span id="comun1">—</span>
+            <!-- Fondo común y ajuste -->
+            <div class="mt-6 pt-6 border-t border-slate-200 space-y-4">
+              <div>
+                <label for="fondoComun" class="block text-sm font-medium text-slate-600 mb-1">Aportación a la cuenta común</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
+                  <input type="number" id="fondoComun" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
+                         placeholder="1200" value="1200" step="0.01" inputmode="decimal" min="0">
+                </div>
               </div>
-              <div class="p-3 bg-slate-50 rounded-lg">
-                <span class="font-medium">Aportación pareja:</span> <span id="comun2">—</span>
+              <div>
+                <label for="ajuste" class="block text-sm font-medium text-slate-600 mb-1">Ajuste entre vosotros</label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
+                  <input type="number" id="ajuste" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
+                         placeholder="0" value="0" step="0.01" inputmode="decimal">
+                </div>
+                <p class="text-xs text-slate-500 mt-1.5">Positivo si te deben a ti, negativo si debes tú.</p>
               </div>
             </div>
 
-            <!-- Aviso -->
-            <p id="warning" class="mt-2 text-sm text-amber-700"></p>
+            <!-- Acciones -->
+            <div class="mt-6 flex items-center gap-3">
+              <button id="btnReset"
+                      class="px-3 py-2 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-sm">
+                Restablecer valores
+              </button>
+            </div>
           </div>
         </div>
 
-        <div class="card" aria-live="polite">
-          <h2 class="text-xl font-semibold mb-4 text-slate-700">3. ✅ Resultado final: transferencias</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="result-box" style="background:rgba(239,125,112,.12); color:#3f2c2b; border:1px solid #f3d1cd">
-              <h3 class="font-semibold mb-2">Transferir a tu cuenta</h3>
-              <p id="transferencia1" class="text-3xl font-extrabold">1.095,45 €</p>
+        <!-- Columna de Resultados -->
+        <div class="lg:col-span-3 space-y-6">
+          <div class="card" aria-live="polite">
+            <h2 class="text-xl font-semibold mb-4 text-slate-700">2. Resumen y reparto</h2>
+
+            <div class="space-y-3 text-slate-600">
+              <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                <span class="font-medium">Ingresos totales:</span>
+                <span id="ingresoTotal" class="font-bold text-lg text-slate-800">3.300,00 €</span>
+              </div>
+              <div class="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                <span class="font-medium">Dinero a repartir:</span>
+                <span id="dineroRepartir" class="badge-success font-bold text-lg">2.100,00 €</span>
+              </div>
+
+              <!-- Donut + leyenda -->
+              <div class="mt-4 pt-4 border-t border-slate-200">
+                <h3 class="font-semibold text-center mb-3">Distribución</h3>
+                <div class="flex items-center justify-center gap-6">
+                  <!-- Donut -->
+                  <div class="relative w-36 h-36 rounded-full donut" id="donut" aria-label="Distribución de aportación">
+                    <div class="absolute inset-6 rounded-full bg-white ring-1 ring-[#e6e8ef]"></div>
+                    <div class="absolute inset-0 grid place-items-center">
+                      <span id="p1Center" class="font-extrabold text-2xl" style="color:var(--ink)">60%</span>
+                    </div>
+                  </div>
+                  <!-- Leyenda -->
+                  <ul class="text-sm text-slate-600">
+                    <li class="mb-2">
+                      <span class="brand-dot" style="background:var(--primary)"></span>
+                      <span class="font-medium text-slate-700">Tu parte</span>:
+                      <span id="porcentaje1" class="font-semibold">60%</span>
+                    </li>
+                    <li>
+                      <span class="brand-dot" style="background:var(--muted); border:1px solid #cdd1d8"></span>
+                      <span class="font-medium text-slate-700">Pareja</span>:
+                      <span id="porcentaje2" class="font-semibold">40%</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <!-- Aportaciones al fondo -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 text-sm text-slate-600">
+                <div class="p-3 bg-slate-50 rounded-lg">
+                  <span class="font-medium">Tu aportación al fondo:</span> <span id="comun1">—</span>
+                </div>
+                <div class="p-3 bg-slate-50 rounded-lg">
+                  <span class="font-medium">Aportación pareja:</span> <span id="comun2">—</span>
+                </div>
+              </div>
+
+              <!-- Aviso -->
+              <p id="warning" class="mt-2 text-sm text-amber-700"></p>
             </div>
-            <div class="result-box" style="background:rgba(16,185,129,.12); color:#135b46; border:1px solid #cbe9db">
-              <h3 class="font-semibold mb-2">Transferir a cuenta pareja</h3>
-              <p id="transferencia2" class="text-3xl font-extrabold">1.004,55 €</p>
+          </div>
+
+          <div class="card" aria-live="polite">
+            <h2 class="text-xl font-semibold mb-4 text-slate-700">3. ✅ Resultado final: transferencias</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="result-box" style="background:rgba(239,125,112,.12); color:#3f2c2b; border:1px solid #f3d1cd">
+                <h3 class="font-semibold mb-2">Transferir a tu cuenta</h3>
+                <p id="transferencia1" class="text-3xl font-extrabold">1.095,45 €</p>
+              </div>
+              <div class="result-box" style="background:rgba(16,185,129,.12); color:#135b46; border:1px solid #cbe9db">
+                <h3 class="font-semibold mb-2">Transferir a cuenta pareja</h3>
+                <p id="transferencia2" class="text-3xl font-extrabold">1.004,55 €</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- TAB: Reembolsos -->
     <section class="tab-section hidden" data-tab-section="reimburse">
       <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
         <div class="lg:col-span-2">
@@ -355,6 +359,7 @@
       </div>
     </section>
 
+    <!-- TAB: Divisor rápido -->
     <section class="tab-section hidden" data-tab-section="split">
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div class="card space-y-5">
@@ -408,731 +413,16 @@
       </div>
     </section>
 
+    <!-- Footer -->
     <footer class="text-center mt-10 text-sm text-slate-500">
-      <p>Creado para una gestión financiera clara y justa.</p>
+      <p>Creado para una gestión financiera clara y justa. v2.0</p>
     </footer>
   </main>
 
-  <!-- Registro del Service Worker (desactivado en desarrollo/local) -->
-  <script>
-    const isDevHost = ['localhost','127.0.0.1'].includes(location.hostname) || location.hostname.startsWith('192.168.');
-    if ('serviceWorker' in navigator && !isDevHost) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(console.error);
-      });
-    } else {
-      // Si estás en local, intenta desregistrar SWs previos y limpiar cachés
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(regs => regs.forEach(r => r.unregister()));
-      }
-      if ('caches' in window) {
-        caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
-      }
-    }
-  </script>
-
-  <!-- Lógica de la app -->
-  <script>
-    // Utilidades
-    const money = n => new Intl.NumberFormat('es-ES', {
-      style: 'currency', currency: 'EUR', minimumFractionDigits: 2, maximumFractionDigits: 2
-    }).format(n);
-    const fmtPct = n => new Intl.NumberFormat('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(n);
-    const round2 = n => Math.round((Number(n) + Number.EPSILON) * 100) / 100;
-
-    const escapeHtml = str => String(str ?? '').replace(/[&<>"']/g, ch => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      '"': '&quot;',
-      "'": '&#39;'
-    })[ch] || ch);
-    const todayISO = () => new Date().toISOString().slice(0, 10);
-    const uid = () => (window.crypto?.randomUUID?.() ?? `id-${Date.now().toString(36)}-${Math.random().toString(16).slice(2)}`);
-
-    const elementCache = {};
-    const getEl = id => {
-      if (!(id in elementCache)) elementCache[id] = document.getElementById(id);
-      return elementCache[id];
-    };
-
-    const read = (id, { allowNegative = false } = {}) => {
-      const el = getEl(id);
-      if (!el) return 0;
-      let v = String(el.value ?? '').replace(',', '.');
-      v = parseFloat(v);
-      if (Number.isNaN(v)) v = 0;
-      if (!allowNegative) v = Math.max(0, v);
-      return v;
-    };
-
-    // Estado
-    const tabStorageKey = 'a_medias_active_tab';
-    const reimburseKey = 'a_medias_reimbursements';
-    let activeTab = 'calc';
-    let reimbursements = [];
-
-    let mode = 'prop'; // 'prop' | 'eq'
-    const saveState = () => {
-      const data = {
-        nomina1: read('nomina1'),
-        nomina2: read('nomina2'),
-        fondoComun: read('fondoComun'),
-        ajuste: read('ajuste', { allowNegative: true }),
-        mode
-      };
-      localStorage.setItem('parejas_calc', JSON.stringify(data));
-    };
-
-    const loadState = () => {
-      try {
-        const data = JSON.parse(localStorage.getItem('parejas_calc') || '{}');
-        if (data.nomina1 != null) getEl('nomina1').value = data.nomina1;
-        if (data.nomina2 != null) getEl('nomina2').value = data.nomina2;
-        if (data.fondoComun != null) getEl('fondoComun').value = data.fondoComun;
-        if (data.ajuste != null) getEl('ajuste').value = data.ajuste;
-        if (data.mode === 'eq' || data.mode === 'prop') mode = data.mode;
-      } catch {}
-    };
-
-    // Cálculo principal
-    function calculate() {
-      const nomina1 = read('nomina1');
-      const nomina2 = read('nomina2');
-      const fondoComun = read('fondoComun');
-      const ajuste = read('ajuste', { allowNegative: true });
-
-      const ingresoTotal = round2(nomina1 + nomina2);
-
-      // Porcentaje según modo
-      let p1 = mode === 'eq'
-        ? 0.5
-        : (ingresoTotal > 0 ? nomina1 / ingresoTotal : 0.5);
-      p1 = Math.min(1, Math.max(0, p1));
-
-      const comun1 = round2(fondoComun * p1);
-      const comun2 = round2(fondoComun * (1 - p1));
-
-      let dineroRepartir = round2(ingresoTotal - fondoComun);
-
-      const warningEl = getEl('warning');
-      if (warningEl) warningEl.textContent = '';
-      if (dineroRepartir < 0) {
-        dineroRepartir = 0;
-        if (warningEl) warningEl.textContent =
-          'La aportación a la cuenta común supera los ingresos totales. Revisa las cifras.';
-      }
-
-      const sobrante1 = round2(nomina1 - comun1);
-      const sobrante2 = round2(nomina2 - comun2);
-
-      const transferencia1 = round2(sobrante1 - ajuste);
-      const transferencia2 = round2(sobrante2 + ajuste);
-
-      // Pintar UI
-      getEl('ingresoTotal').textContent = money(ingresoTotal);
-      getEl('dineroRepartir').textContent = money(dineroRepartir);
-
-      const p1pct = p1 * 100;
-      getEl('porcentaje1').textContent = `${fmtPct(p1pct)}%`;
-      getEl('porcentaje2').textContent = `${fmtPct(100 - p1pct)}%`;
-
-      // Donut
-      const p1deg = Math.round(p1 * 360);
-      const donut = getEl('donut');
-      if (donut) donut.style.background = `conic-gradient(var(--primary) ${p1deg}deg, var(--muted) 0)`;
-      const p1Center = getEl('p1Center');
-      if (p1Center) p1Center.textContent = `${fmtPct(p1pct)}%`;
-
-      // Aportaciones y resultados
-      getEl('comun1').textContent = money(comun1);
-      getEl('comun2').textContent = money(comun2);
-      getEl('transferencia1').textContent = money(transferencia1);
-      getEl('transferencia2').textContent = money(transferencia2);
-
-      saveState();
-    }
-
-    function updateSplitChips(activeCount) {
-      document.querySelectorAll('[data-split-count]').forEach(btn => {
-        const target = parseInt(btn.dataset.splitCount, 10);
-        const isActive = target === activeCount;
-        btn.classList.toggle('chip-button-active', isActive);
-      });
-    }
-
-    function updateSplitResult() {
-      const total = read('split-total');
-      const amountEachEl = getEl('split-amount-each');
-      const detailEl = getEl('split-detail');
-      const remainderEl = getEl('split-remainder');
-      const contextEl = getEl('split-context');
-      const countInput = getEl('split-count');
-      if (!countInput) return;
-
-      let count = Math.max(1, parseInt(countInput.value, 10) || 1);
-      countInput.value = count;
-
-      const totalCents = Math.round(total * 100);
-      const baseCents = count ? Math.floor(totalCents / count) : 0;
-      const remainder = count ? totalCents - baseCents * count : 0;
-      const higherCents = baseCents + (remainder > 0 ? 1 : 0);
-
-      if (amountEachEl) {
-        const avg = count > 0 ? round2(total / count) : 0;
-        amountEachEl.textContent = money(avg);
-      }
-
-      if (detailEl) {
-        if (total <= 0) {
-          detailEl.textContent = 'Introduce un importe para calcular el reparto.';
-        } else if (remainder === 0) {
-          detailEl.textContent = `Todos pagan ${money(baseCents / 100)} para cubrir ${money(total)}.`;
-        } else {
-          const higherPeople = remainder;
-          const lowerPeople = count - remainder;
-          detailEl.textContent = `${higherPeople} ${(higherPeople === 1 ? 'persona' : 'personas')} pagan ${money(higherCents / 100)} y ${lowerPeople} ${(lowerPeople === 1 ? 'persona' : 'personas')} pagan ${money(baseCents / 100)} para llegar a ${money(total)}.`;
-        }
-      }
-
-      if (remainderEl) {
-        remainderEl.textContent = remainder === 0
-          ? ''
-          : 'Distribuimos los céntimos sobrantes para que el total encaje al céntimo.';
-      }
-
-      if (contextEl) {
-        contextEl.textContent = count === 2
-          ? 'Ideal para dividir un gasto entre tu pareja y tú.'
-          : `Dividiendo entre ${count} personas.`;
-      }
-
-      updateSplitChips(count);
-    }
-
-    // UI del modo
-    function updateModeUI() {
-      const btnProp = getEl('mode-prop');
-      const btnEq = getEl('mode-eq');
-      const hint = getEl('mode-hint');
-      const debtProp = getEl('debt-mode-prop');
-      const debtEq = getEl('debt-mode-eq');
-      const debtBaseClass = "debt-mode-btn flex-1 px-3 py-1.5 rounded-lg text-xs font-medium text-center transition-colors whitespace-nowrap";
-      const debtActiveExtra = "bg-white text-slate-900 shadow ring-1 ring-[var(--primary)] font-semibold";
-      const debtInactiveExtra = "bg-transparent text-slate-600 hover:text-slate-900";
-      const shareActionBtn = getEl('btn-share-action');
-
-      if (mode === 'prop') {
-        btnProp.className = "flex-1 px-3 py-1.5 rounded-lg text-sm font-medium text-center bg-white shadow text-slate-900 ring-1 ring-[var(--primary)]";
-        btnEq.className = "flex-1 px-3 py-1.5 rounded-lg text-sm font-medium text-center text-slate-700 hover:text-slate-900";
-        btnProp.setAttribute('aria-pressed','true'); btnEq.setAttribute('aria-pressed','false');
-        if (hint) hint.textContent = "Reparte según el peso de cada nómina.";
-        if (debtProp && debtEq) {
-          debtProp.className = `${debtBaseClass} ${debtActiveExtra}`;
-          debtEq.className = `${debtBaseClass} ${debtInactiveExtra}`;
-          debtProp.setAttribute('aria-pressed','true');
-          debtEq.setAttribute('aria-pressed','false');
-        }
-      } else {
-        btnEq.className = "flex-1 px-3 py-1.5 rounded-lg text-sm font-medium text-center bg-white shadow text-slate-900 ring-1 ring-[var(--primary)]";
-        btnProp.className = "flex-1 px-3 py-1.5 rounded-lg text-sm font-medium text-center text-slate-700 hover:text-slate-900";
-        btnEq.setAttribute('aria-pressed','true'); btnProp.setAttribute('aria-pressed','false');
-        if (hint) hint.textContent = "Reparte exactamente al 50% cada concepto.";
-        if (debtProp && debtEq) {
-          debtEq.className = `${debtBaseClass} ${debtActiveExtra}`;
-          debtProp.className = `${debtBaseClass} ${debtInactiveExtra}`;
-          debtEq.setAttribute('aria-pressed','true');
-          debtProp.setAttribute('aria-pressed','false');
-        }
-      }
-      if (shareActionBtn) {
-        shareActionBtn.textContent = mode === 'prop' ? 'Según ingresos' : 'Divide al 50%';
-      }
-    }
-
-    function setMode(m){
-      mode = m;
-      updateModeUI();
-      calculate();
-    }
-
-    function setActiveTab(tabId) {
-      activeTab = tabId;
-      document.querySelectorAll('[data-tab-section]').forEach(section => {
-        const isActive = section.dataset.tabSection === tabId;
-        section.classList.toggle('hidden', !isActive);
-      });
-      document.querySelectorAll('[data-tab-target]').forEach(btn => {
-        const isActive = btn.dataset.tabTarget === tabId;
-        btn.classList.toggle('tab-button-active', isActive);
-        btn.classList.toggle('text-slate-900', isActive);
-        btn.classList.toggle('text-slate-600', !isActive);
-      });
-      try { localStorage.setItem(tabStorageKey, tabId); } catch {}
-    }
-
-    function setupTabs() {
-      const buttons = document.querySelectorAll('[data-tab-target]');
-      if (!buttons.length) return;
-      buttons.forEach(btn => {
-        btn.addEventListener('click', () => setActiveTab(btn.dataset.tabTarget));
-      });
-      let stored = 'calc';
-      try {
-        const raw = localStorage.getItem(tabStorageKey);
-        if (raw && document.querySelector(`[data-tab-section="${raw}"]`)) stored = raw;
-      } catch {}
-      setActiveTab(stored);
-    }
-
-    const loadReimbursements = () => {
-      try {
-        const raw = JSON.parse(localStorage.getItem(reimburseKey) || '[]');
-        if (Array.isArray(raw)) {
-          reimbursements = raw.map(item => ({
-            payments: [],
-            ...item,
-            total: round2(item.total ?? 0),
-            myShare: round2(item.myShare ?? 0),
-            partnerShare: round2(item.partnerShare ?? 0),
-            owedAmount: round2(item.owedAmount ?? 0),
-            installments: Math.max(1, parseInt(item.installments ?? 1, 10) || 1),
-            installmentAmount: round2(item.installmentAmount ?? (item.owedAmount ?? 0)),
-            createdAt: item.createdAt || new Date().toISOString()
-          }));
-        }
-      } catch {
-        reimbursements = [];
-      }
-    };
-
-    const saveReimbursements = () => {
-      try {
-        localStorage.setItem(reimburseKey, JSON.stringify(reimbursements));
-      } catch {}
-    };
-
-    const totalPaid = debt => round2((debt.payments || []).reduce((acc, p) => acc + (Number(p.amount) || 0), 0));
-    const remainingAmount = debt => Math.max(0, round2((debt.owedAmount || 0) - totalPaid(debt)));
-
-    function renderReimbursements() {
-      const list = getEl('debt-list');
-      const empty = getEl('debt-empty');
-      if (!list) return;
-      if (!reimbursements.length) {
-        if (empty) empty.classList.remove('hidden');
-        list.innerHTML = '';
-        return;
-      }
-      if (empty) empty.classList.add('hidden');
-
-      list.innerHTML = reimbursements.map(debt => {
-        const paid = totalPaid(debt);
-        const pending = remainingAmount(debt);
-        const pct = debt.owedAmount > 0 ? Math.min(100, Math.round((paid / debt.owedAmount) * 100)) : 100;
-        const payerLabel = debt.payer === 'me' ? 'Tú' : 'Tu pareja';
-        const owedLabel = debt.owedBy === 'partner' ? 'Tu pareja te debe' : 'Le debes a tu pareja';
-        const installmentsLabel = debt.installments > 1
-          ? `${debt.installments} cuotas aprox. de ${money(debt.installmentAmount)}`
-          : 'Pago único';
-        const paymentsList = (debt.payments || []).length
-          ? debt.payments.map(p => `
-              <li class="flex justify-between gap-3 py-1 border-b border-slate-100 last:border-0 text-sm">
-                <div>
-                  <span class="font-medium text-slate-700">${money(p.amount)}</span>
-                  ${p.note ? `<span class="text-xs text-slate-500 block">${escapeHtml(p.note)}</span>` : ''}
-                </div>
-                <span class="text-xs text-slate-500 whitespace-nowrap">${escapeHtml(p.date || '')}</span>
-              </li>
-            `).join('')
-          : '<li class="text-sm text-slate-500 italic">Aún no hay pagos registrados.</li>';
-
-        return `
-          <article class="card space-y-4" data-debt-id="${escapeHtml(debt.id)}">
-            <header class="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
-              <div>
-                <h3 class="text-lg font-semibold text-slate-800">${escapeHtml(debt.concept)}</h3>
-                <p class="text-sm text-slate-500">Pagó: ${payerLabel} · ${installmentsLabel}</p>
-                ${debt.note ? `<p class="mt-1 text-xs text-slate-500">${escapeHtml(debt.note)}</p>` : ''}
-              </div>
-              <div class="text-right">
-                <p class="text-sm text-slate-500">Total</p>
-                <p class="text-2xl font-semibold text-slate-800">${money(debt.total)}</p>
-              </div>
-            </header>
-            <div class="flex flex-wrap gap-2 md:justify-end">
-              <button type="button" class="inline-flex items-center gap-1 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-emerald-400 hover:text-emerald-600 transition"
-                      data-debt-action="settle" data-debt-id="${escapeHtml(debt.id)}">
-                Liquidar deuda
-              </button>
-              <button type="button" class="inline-flex items-center gap-1 rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-medium text-rose-600 bg-rose-50 hover:bg-rose-100 transition"
-                      data-debt-action="delete" data-debt-id="${escapeHtml(debt.id)}">
-                Eliminar
-              </button>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-              <div class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-                <p class="text-slate-500">Tu parte</p>
-                <p class="font-semibold text-slate-800">${money(debt.myShare)}</p>
-              </div>
-              <div class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-                <p class="text-slate-500">Parte pareja</p>
-                <p class="font-semibold text-slate-800">${money(debt.partnerShare)}</p>
-              </div>
-              <div class="rounded-lg border border-slate-200 px-3 py-2 ${pending === 0 ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}">
-                <p class="text-slate-500">${owedLabel}</p>
-                <p class="font-semibold ${pending === 0 ? 'text-emerald-700' : 'text-amber-700'}">${pending === 0 ? 'Liquidado' : money(pending)}</p>
-              </div>
-            </div>
-
-            <div>
-              <div class="flex items-center justify-between text-sm text-slate-500 mb-1">
-                <span>Progreso de devolución</span>
-                <span>${pct}%</span>
-              </div>
-              <div class="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
-                <div class="h-full bg-[var(--primary)] transition-all" style="width:${pct}%;"></div>
-              </div>
-            </div>
-
-            <section class="space-y-2">
-              <h4 class="text-sm font-semibold text-slate-600 uppercase tracking-wide">Historial</h4>
-              <ul class="divide-y divide-slate-100 rounded-lg border border-slate-200 bg-white overflow-hidden">
-                ${paymentsList}
-              </ul>
-            </section>
-
-            <form class="payment-form grid gap-3 md:grid-cols-[repeat(auto-fit,minmax(140px,1fr))]" data-debt-id="${escapeHtml(debt.id)}">
-              <div class="md:col-span-1">
-                <label class="text-xs text-slate-500 block mb-1">Importe</label>
-                <div class="relative">
-                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">€</span>
-                  <input name="amount" type="number" step="0.01" min="0" class="pl-7 w-full rounded-lg border border-slate-300 py-2 px-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200" placeholder="250">
-                </div>
-              </div>
-              <div>
-                <label class="text-xs text-slate-500 block mb-1">Fecha</label>
-                <input name="date" type="date" class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200" value="${todayISO()}">
-              </div>
-              <div class="md:col-span-2">
-                <label class="text-xs text-slate-500 block mb-1">Nota (opcional)</label>
-                <input name="note" type="text" class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200" placeholder="Bizum 1/5, transferencia, efectivo...">
-              </div>
-              <div class="md:col-span-full flex flex-col gap-2 sm:flex-row sm:items-center">
-                <button type="submit" class="inline-flex justify-center rounded-lg bg-emerald-500 text-white font-semibold px-4 py-2 shadow hover:bg-emerald-600 transition">
-                  Registrar pago
-                </button>
-                <p class="payment-error text-xs text-rose-600"></p>
-              </div>
-            </form>
-          </article>
-        `;
-      }).join('');
-
-      attachPaymentHandlers();
-      attachDebtActionHandlers();
-    }
-
-    function attachPaymentHandlers() {
-      document.querySelectorAll('.payment-form').forEach(form => {
-        form.addEventListener('submit', handlePaymentSubmit);
-      });
-    }
-
-    function handlePaymentSubmit(event) {
-      event.preventDefault();
-      const form = event.currentTarget;
-      const debtId = form.dataset.debtId;
-      const amountInput = form.elements.amount;
-      const dateInput = form.elements.date;
-      const noteInput = form.elements.note;
-      const errorEl = form.querySelector('.payment-error');
-      if (errorEl) errorEl.textContent = '';
-
-      const amount = parseFloat(String(amountInput.value || '').replace(',', '.')) || 0;
-      if (amount <= 0) {
-        if (errorEl) errorEl.textContent = 'Introduce un importe válido.';
-        return;
-      }
-
-      const debt = reimbursements.find(d => d.id === debtId);
-      if (!debt) {
-        if (errorEl) errorEl.textContent = 'No se encontró el reembolso.';
-        return;
-      }
-
-      const remaining = remainingAmount(debt);
-      if (amount > remaining + 0.01) {
-        if (errorEl) errorEl.textContent = 'El pago supera lo pendiente.';
-        return;
-      }
-
-      const payment = {
-        id: uid(),
-        amount: round2(amount),
-        date: dateInput.value || todayISO(),
-        note: noteInput.value.trim()
-      };
-
-      debt.payments = debt.payments || [];
-      debt.payments.push(payment);
-
-      saveReimbursements();
-      renderReimbursements();
-    }
-
-    function attachDebtActionHandlers() {
-      document.querySelectorAll('[data-debt-action]').forEach(btn => {
-        btn.addEventListener('click', handleDebtAction);
-      });
-    }
-
-    function handleDebtAction(event) {
-      const btn = event.currentTarget;
-      const { debtId, debtAction } = btn.dataset;
-      const debt = reimbursements.find(d => d.id === debtId);
-      if (!debt) return;
-
-      if (debtAction === 'delete') {
-        if (!confirm('¿Seguro que quieres eliminar este reembolso?')) return;
-        reimbursements = reimbursements.filter(d => d.id !== debtId);
-        saveReimbursements();
-        renderReimbursements();
-        return;
-      }
-
-      if (debtAction === 'settle') {
-        const pending = remainingAmount(debt);
-        if (pending <= 0.01) {
-          alert('Este reembolso ya está liquidado.');
-          return;
-        }
-        if (!confirm(`Se registrará un pago final de ${money(pending)} para liquidar la deuda. ¿Continuar?`)) return;
-        const payment = {
-          id: uid(),
-          amount: round2(pending),
-          date: todayISO(),
-          note: 'Liquidación manual'
-        };
-        debt.payments = debt.payments || [];
-        debt.payments.push(payment);
-        saveReimbursements();
-        renderReimbursements();
-      }
-    }
-
-    function updateDebtPreview() {
-      const total = read('debt-total');
-      const myShare = read('debt-my-share');
-      const installmentsInput = getEl('debt-installments');
-      const payer = document.querySelector('input[name="debt-payer"]:checked')?.value || 'me';
-      const preview = getEl('debt-preview');
-      const errorEl = getEl('debt-error');
-
-      if (errorEl) errorEl.textContent = '';
-      if (!preview) return;
-
-      if (!total && !myShare) {
-        preview.textContent = 'Registra el total y tu parte para calcular cuánto queda pendiente.';
-        return;
-      }
-
-      if (myShare > total) {
-        preview.textContent = 'Tu parte no puede ser mayor que el total del gasto.';
-        return;
-      }
-
-      const partnerShare = round2(Math.max(0, total - myShare));
-      const installments = Math.max(1, parseInt(installmentsInput?.value ?? '1', 10) || 1);
-      const owedAmount = payer === 'me' ? partnerShare : myShare;
-      const installmentAmount = installments > 0 ? round2(owedAmount / installments) : owedAmount;
-
-      const direction = payer === 'me'
-        ? `Tu pareja te devolverá ${money(owedAmount)}`
-        : `Devolverás ${money(owedAmount)} a tu pareja`;
-      const cuotaText = installments > 1
-        ? `en ${installments} cuotas aproximadas de ${money(installmentAmount)}`
-        : 'en un solo pago';
-
-      preview.innerHTML = `
-        <div class="flex flex-col gap-1">
-          <span>Tu parte: <strong>${money(myShare)}</strong> · Parte pareja: <strong>${money(partnerShare)}</strong></span>
-          <span>${direction} ${cuotaText}.</span>
-        </div>
-      `;
-    }
-
-    function applyShareShortcut(preferredMode) {
-      const total = read('debt-total');
-      if (total <= 0) return;
-
-      const myShareInput = getEl('debt-my-share');
-      if (!myShareInput) return;
-
-      const shareMode = preferredMode || mode;
-      let proportion = 0.5;
-      if (shareMode === 'prop') {
-        const nomina1 = read('nomina1');
-        const nomina2 = read('nomina2');
-        const ingresoTotal = nomina1 + nomina2;
-        if (ingresoTotal > 0) {
-          proportion = Math.min(1, Math.max(0, nomina1 / ingresoTotal));
-        }
-      }
-
-      const computedShare = Math.min(total, round2(total * proportion));
-      myShareInput.value = computedShare;
-      updateDebtPreview();
-    }
-
-    function handleAddDebt(event) {
-      event.preventDefault();
-      const concept = getEl('debt-concept')?.value.trim();
-      const total = read('debt-total');
-      const myShare = read('debt-my-share');
-      const installments = Math.max(1, parseInt(getEl('debt-installments')?.value ?? '1', 10) || 1);
-      const firstDate = getEl('debt-first-date')?.value || todayISO();
-      const payer = document.querySelector('input[name="debt-payer"]:checked')?.value || 'me';
-      const note = getEl('debt-note')?.value.trim();
-      const errorEl = getEl('debt-error');
-
-      if (errorEl) errorEl.textContent = '';
-
-      if (!concept) {
-        if (errorEl) errorEl.textContent = 'Añade un concepto para identificar el gasto.';
-        return;
-      }
-      if (total <= 0) {
-        if (errorEl) errorEl.textContent = 'El total debe ser mayor que cero.';
-        return;
-      }
-      if (myShare < 0 || myShare > total) {
-        if (errorEl) errorEl.textContent = 'Tu parte debe estar entre 0 y el total.';
-        return;
-      }
-
-      const partnerShare = round2(Math.max(0, total - myShare));
-      const owedAmount = payer === 'me' ? partnerShare : myShare;
-
-      if (owedAmount <= 0) {
-        if (errorEl) errorEl.textContent = 'No hay importe pendiente de devolver.';
-        return;
-      }
-
-      const debt = {
-        id: uid(),
-        concept,
-        total: round2(total),
-        myShare: round2(myShare),
-        partnerShare,
-        payer,
-        owedBy: payer === 'me' ? 'partner' : 'me',
-        owedAmount: round2(owedAmount),
-        installments,
-        installmentAmount: round2(owedAmount / installments),
-        note,
-        createdAt: new Date().toISOString(),
-        firstDate,
-        payments: []
-      };
-
-      reimbursements.unshift(debt);
-      saveReimbursements();
-      renderReimbursements();
-      setActiveTab('reimburse');
-
-      const form = getEl('debt-form');
-      form?.reset();
-      const dateInput = getEl('debt-first-date');
-      if (dateInput) dateInput.value = todayISO();
-      const payerInput = document.querySelector('input[name="debt-payer"][value="me"]');
-      if (payerInput) payerInput.checked = true;
-      updateDebtPreview();
-    }
-
-    function initReimbursements() {
-      const form = getEl('debt-form');
-      if (!form) return;
-      const dateInput = getEl('debt-first-date');
-      if (dateInput && !dateInput.value) dateInput.value = todayISO();
-
-      ['debt-total', 'debt-my-share', 'debt-installments'].forEach(id => {
-        const el = getEl(id);
-        el?.addEventListener('input', updateDebtPreview);
-      });
-      getEl('btn-share-action')?.addEventListener('click', () => applyShareShortcut());
-      document.querySelectorAll('input[name="debt-payer"]').forEach(radio => {
-        radio.addEventListener('change', updateDebtPreview);
-      });
-      form.addEventListener('submit', handleAddDebt);
-
-      loadReimbursements();
-      renderReimbursements();
-      updateDebtPreview();
-    }
-
-    function setupSplitCalculator() {
-      const totalInput = getEl('split-total');
-      const countInput = getEl('split-count');
-      if (!totalInput || !countInput) return;
-
-      totalInput.addEventListener('input', updateSplitResult);
-      countInput.addEventListener('input', updateSplitResult);
-
-      document.querySelectorAll('[data-split-count]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const target = parseInt(btn.dataset.splitCount, 10) || 2;
-          countInput.value = target;
-          updateSplitResult();
-        });
-      });
-
-      updateSplitResult();
-    }
-
-    // Bootstrap
-    let defaultState = {};
-    window.onload = () => {
-      setupTabs();
-
-      defaultState = {
-        nomina1: parseFloat(getEl('nomina1').value) || 0,
-        nomina2: parseFloat(getEl('nomina2').value) || 0,
-        fondoComun: parseFloat(getEl('fondoComun').value) || 0,
-        ajuste: parseFloat(getEl('ajuste').value) || 0
-      };
-
-      loadState();
-      updateModeUI();
-      calculate();
-
-      const inputs = ['nomina1','nomina2','fondoComun','ajuste'];
-      let t;
-      inputs.forEach(id => {
-        const el = getEl(id);
-        el.addEventListener('input', () => { clearTimeout(t); t = setTimeout(calculate, 80); });
-      });
-
-      getEl('btnReset')?.addEventListener('click', () => {
-        try { localStorage.removeItem('parejas_calc'); } catch {}
-        getEl('nomina1').value = defaultState.nomina1 ?? 0;
-        getEl('nomina2').value = defaultState.nomina2 ?? 0;
-        getEl('fondoComun').value = defaultState.fondoComun ?? 0;
-        getEl('ajuste').value = defaultState.ajuste ?? 0;
-        mode = 'prop';
-        updateModeUI();
-        calculate();
-      });
-
-      getEl('mode-prop').addEventListener('click', () => setMode('prop'));
-      getEl('mode-eq').addEventListener('click', () => setMode('eq'));
-      getEl('debt-mode-prop')?.addEventListener('click', () => { setMode('prop'); applyShareShortcut('prop'); });
-      getEl('debt-mode-eq')?.addEventListener('click', () => { setMode('eq'); applyShareShortcut('eq'); });
-
-      initReimbursements();
-      setupSplitCalculator();
-    };
-  </script>
+  <!-- Configuración de Supabase (opcional) -->
+  <script src="./config.js"></script>
+
+  <!-- App principal -->
+  <script type="module" src="./js/app.js"></script>
 </body>
 </html>

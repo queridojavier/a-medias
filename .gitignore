@@ -1,0 +1,32 @@
+# Credenciales de Supabase (privadas)
+config.js
+
+# Backups
+*.backup
+*.bak
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Dependencias (si usas npm en el futuro)
+node_modules/
+
+# Build/dist (si usas build tools)
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporal
+.tmp/
+temp/
