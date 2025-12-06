@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>A Medias - Calculadora de gastos en pareja</title>
 
   <!-- Tailwind por CDN -->
@@ -16,7 +17,7 @@
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
   <link rel="icon" href="./icons/icon-192.png" type="image/png">
   <meta name="apple-mobile-web-app-title" content="A Medias">
-  <meta name="theme-color" content="#E07A5F">
+  <meta name="theme-color" content="#81B29A">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="description" content="Calculadora para dividir gastos en pareja de forma justa y transparente">
@@ -32,7 +33,8 @@
   </div>
 
   <!-- Indicador de sincronización (flotante, opcional) -->
-  <div id="sync-indicator" class="sync-indicator idle hidden" style="position: fixed; bottom: 1rem; right: 1rem; z-index: 40;">
+  <div id="sync-indicator" class="sync-indicator idle hidden"
+    style="position: fixed; bottom: 1rem; right: 1rem; z-index: 40;">
     <span>Local</span>
   </div>
 
@@ -48,19 +50,16 @@
     <!-- Tabs de navegación -->
     <div class="flex justify-center mb-8">
       <div class="inline-flex bg-white border border-slate-200 rounded-2xl p-1 shadow-sm">
-        <button type="button"
-                class="tab-button px-4 py-2 text-sm font-medium rounded-xl text-slate-600"
-                data-tab-target="calc">
+        <button type="button" class="tab-button px-4 py-2 text-sm font-medium rounded-xl text-slate-600"
+          data-tab-target="calc">
           División mensual
         </button>
-        <button type="button"
-                class="tab-button px-4 py-2 text-sm font-medium rounded-xl text-slate-600"
-                data-tab-target="reimburse">
+        <button type="button" class="tab-button px-4 py-2 text-sm font-medium rounded-xl text-slate-600"
+          data-tab-target="reimburse">
           Reembolsos
         </button>
-        <button type="button"
-                class="tab-button px-4 py-2 text-sm font-medium rounded-xl text-slate-600"
-                data-tab-target="split">
+        <button type="button" class="tab-button px-4 py-2 text-sm font-medium rounded-xl text-slate-600"
+          data-tab-target="split">
           Divisor rápido
         </button>
       </div>
@@ -80,27 +79,35 @@
           </p>
         </div>
         <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
-          <button type="button" id="share-create" class="inline-flex justify-center items-center rounded-xl bg-[var(--primary)] text-white font-semibold py-2 px-4 shadow hover:bg-[var(--primary-700)] transition">
+          <button type="button" id="share-create"
+            class="inline-flex justify-center items-center rounded-xl bg-[var(--primary)] text-slate-800 font-semibold py-2 px-4 shadow hover:bg-[var(--primary-700)] transition">
             Crear enlace seguro
           </button>
-          <button type="button" id="share-copy" class="hidden inline-flex justify-center items-center rounded-xl border border-slate-300 text-slate-700 font-semibold py-2 px-4 hover:border-slate-400 transition bg-white">
+          <button type="button" id="share-copy"
+            class="hidden inline-flex justify-center items-center rounded-xl border border-slate-300 text-slate-700 font-semibold py-2 px-4 hover:border-slate-400 transition bg-white">
             Copiar enlace
           </button>
-          <button type="button" id="share-leave" class="hidden inline-flex justify-center items-center rounded-xl border border-slate-200 text-slate-600 font-semibold py-2 px-4 hover:border-slate-400 transition bg-white">
+          <button type="button" id="share-leave"
+            class="hidden inline-flex justify-center items-center rounded-xl border border-slate-200 text-slate-600 font-semibold py-2 px-4 hover:border-slate-400 transition bg-white">
             Salir del enlace
           </button>
         </div>
       </div>
       <div id="share-link-wrapper" class="mt-4 hidden">
-        <label for="share-link-input" class="block text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Enlace compartido</label>
+        <label for="share-link-input"
+          class="block text-xs font-semibold uppercase tracking-wide text-slate-500 mb-1">Enlace compartido</label>
         <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <input type="text" id="share-link-input" readonly class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm bg-slate-50 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200" value="">
-          <button type="button" id="share-copy-secondary" class="inline-flex justify-center items-center rounded-xl border border-slate-300 text-slate-700 font-semibold py-2 px-4 hover:border-slate-400 transition bg-white">
+          <input type="text" id="share-link-input" readonly
+            class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm bg-slate-50 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
+            value="">
+          <button type="button" id="share-copy-secondary"
+            class="inline-flex justify-center items-center rounded-xl border border-slate-300 text-slate-700 font-semibold py-2 px-4 hover:border-slate-400 transition bg-white">
             Copiar enlace
           </button>
         </div>
         <p class="text-xs text-slate-500 mt-2">
-          Solo quien tenga este enlace podrá ver y editar estos datos. Para dejar de compartir, vuelve a esta página y usa "Salir del enlace".
+          Solo quien tenga este enlace podrá ver y editar estos datos. Para dejar de compartir, vuelve a esta página y
+          usa "Salir del enlace".
         </p>
       </div>
     </section>
@@ -118,13 +125,13 @@
               <label class="block text-sm font-medium text-slate-600 mb-2">Modo de reparto</label>
               <div class="flex rounded-xl bg-slate-100 p-1 w-full" role="group" aria-label="Modo de reparto">
                 <button id="mode-prop"
-                        class="flex-1 px-3 py-1.5 rounded-lg text-sm font-medium bg-white shadow text-center text-slate-900 ring-1 ring-[var(--primary)]"
-                        type="button" aria-pressed="true" aria-label="Reparto proporcional">
+                  class="flex-1 px-3 py-1.5 rounded-lg text-sm font-medium bg-white shadow text-center text-slate-900 ring-1 ring-[var(--primary)]"
+                  type="button" aria-pressed="true" aria-label="Reparto proporcional">
                   Proporcional
                 </button>
                 <button id="mode-eq"
-                        class="flex-1 px-3 py-1.5 rounded-lg text-sm font-medium text-center text-slate-700 hover:text-slate-900"
-                        type="button" aria-pressed="false">
+                  class="flex-1 px-3 py-1.5 rounded-lg text-sm font-medium text-center text-slate-700 hover:text-slate-900"
+                  type="button" aria-pressed="false">
                   50 / 50
                 </button>
               </div>
@@ -137,16 +144,18 @@
                 <label for="nomina1" class="block text-sm font-medium text-slate-600 mb-1">Tu nómina</label>
                 <div class="relative">
                   <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
-                  <input type="number" id="nomina1" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
-                         placeholder="1800" value="1800" step="0.01" inputmode="decimal" min="0">
+                  <input type="number" id="nomina1"
+                    class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
+                    placeholder="1800" value="1800" step="0.01" inputmode="decimal" min="0">
                 </div>
               </div>
               <div>
                 <label for="nomina2" class="block text-sm font-medium text-slate-600 mb-1">Nómina de tu pareja</label>
                 <div class="relative">
                   <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
-                  <input type="number" id="nomina2" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
-                         placeholder="1500" value="1500" step="0.01" inputmode="decimal" min="0">
+                  <input type="number" id="nomina2"
+                    class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
+                    placeholder="1500" value="1500" step="0.01" inputmode="decimal" min="0">
                 </div>
               </div>
             </div>
@@ -154,19 +163,22 @@
             <!-- Fondo común y ajuste -->
             <div class="mt-6 pt-6 border-t border-slate-200 space-y-4">
               <div>
-                <label for="fondoComun" class="block text-sm font-medium text-slate-600 mb-1">Aportación a la cuenta común</label>
+                <label for="fondoComun" class="block text-sm font-medium text-slate-600 mb-1">Aportación a la cuenta
+                  común</label>
                 <div class="relative">
                   <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
-                  <input type="number" id="fondoComun" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
-                         placeholder="1200" value="1200" step="0.01" inputmode="decimal" min="0">
+                  <input type="number" id="fondoComun"
+                    class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
+                    placeholder="1200" value="1200" step="0.01" inputmode="decimal" min="0">
                 </div>
               </div>
               <div>
                 <label for="ajuste" class="block text-sm font-medium text-slate-600 mb-1">Ajuste entre vosotros</label>
                 <div class="relative">
                   <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
-                  <input type="number" id="ajuste" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
-                         placeholder="0" value="0" step="0.01" inputmode="decimal">
+                  <input type="number" id="ajuste"
+                    class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
+                    placeholder="0" value="0" step="0.01" inputmode="decimal">
                 </div>
                 <p class="text-xs text-slate-500 mt-1.5">Positivo si te deben a ti, negativo si debes tú.</p>
               </div>
@@ -174,8 +186,7 @@
 
             <!-- Acciones -->
             <div class="mt-6 flex items-center gap-3">
-              <button id="btnReset"
-                      class="px-3 py-2 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-sm">
+              <button id="btnReset" class="px-3 py-2 rounded-lg bg-slate-100 text-slate-700 hover:bg-slate-200 text-sm">
                 Restablecer valores
               </button>
             </div>
@@ -242,11 +253,13 @@
           <div class="card" aria-live="polite">
             <h2 class="text-xl font-semibold mb-4 text-slate-700">3. ✅ Resultado final: transferencias</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="result-box" style="background:rgba(224, 122, 95, .15); color:#C66045; border:1px solid rgba(224, 122, 95, .3)">
+              <div class="result-box"
+                style="background:rgba(224, 122, 95, .15); color:#C66045; border:1px solid rgba(224, 122, 95, .3)">
                 <h3 class="font-semibold mb-2">Transferir a tu cuenta</h3>
                 <p id="transferencia1" class="text-3xl font-extrabold">1.095,45 €</p>
               </div>
-              <div class="result-box" style="background:rgba(129, 178, 154, .2); color:#2D5C49; border:1px solid rgba(129, 178, 154, .3)">
+              <div class="result-box"
+                style="background:rgba(129, 178, 154, .2); color:#2D5C49; border:1px solid rgba(129, 178, 154, .3)">
                 <h3 class="font-semibold mb-2">Transferir a cuenta pareja</h3>
                 <p id="transferencia2" class="text-3xl font-extrabold">1.004,55 €</p>
               </div>
@@ -270,38 +283,52 @@
             <form id="debt-form" class="space-y-4">
               <div>
                 <label for="debt-concept" class="block text-sm font-medium text-slate-600 mb-1">Concepto</label>
-                <input type="text" id="debt-concept" class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200" placeholder="Reforma baño, viaje, compra grande..." required>
+                <input type="text" id="debt-concept"
+                  class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
+                  placeholder="Reforma baño, viaje, compra grande..." required>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label for="debt-total" class="block text-sm font-medium text-slate-600 mb-1">Total pagado</label>
                   <div class="relative">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
-                    <input type="number" id="debt-total" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200" placeholder="5000" step="0.01" min="0" required>
+                    <input type="number" id="debt-total"
+                      class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
+                      placeholder="5000" step="0.01" min="0" required>
                   </div>
                 </div>
                 <div>
-                  <label for="debt-my-share" class="block text-sm font-medium text-slate-600 mb-1">Tu parte del gasto</label>
+                  <label for="debt-my-share" class="block text-sm font-medium text-slate-600 mb-1">Tu parte del
+                    gasto</label>
                   <div class="relative">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
-                    <input type="number" id="debt-my-share" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200" placeholder="2500" step="0.01" min="0" required>
+                    <input type="number" id="debt-my-share"
+                      class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
+                      placeholder="2500" step="0.01" min="0" required>
                   </div>
                 </div>
                 <div class="sm:col-span-2 sm:col-start-2">
                   <div class="sm:flex sm:justify-end">
                     <div class="rounded-2xl bg-slate-100 p-2.5 flex flex-col gap-1.5 w-full sm:max-w-[220px] ml-auto">
-                      <div class="inline-flex rounded-xl bg-white/80 p-0.5 shadow-sm gap-0.5" role="group" aria-label="Modo de reparto rápido en reembolsos">
-                        <button type="button" id="debt-mode-prop" class="debt-mode-btn flex-1 px-2.5 py-1.5 rounded-lg text-[0.7rem] font-semibold text-slate-600 transition-colors text-center whitespace-nowrap" aria-pressed="false" aria-label="Reparto automático">
+                      <div class="inline-flex rounded-xl bg-white/80 p-0.5 shadow-sm gap-0.5" role="group"
+                        aria-label="Modo de reparto rápido en reembolsos">
+                        <button type="button" id="debt-mode-prop"
+                          class="debt-mode-btn flex-1 px-2.5 py-1.5 rounded-lg text-[0.7rem] font-semibold text-slate-600 transition-colors text-center whitespace-nowrap"
+                          aria-pressed="false" aria-label="Reparto automático">
                           Auto
                         </button>
-                        <button type="button" id="debt-mode-eq" class="debt-mode-btn flex-1 px-2.5 py-1.5 rounded-lg text-[0.7rem] font-semibold text-slate-600 transition-colors text-center whitespace-nowrap" aria-pressed="false">
+                        <button type="button" id="debt-mode-eq"
+                          class="debt-mode-btn flex-1 px-2.5 py-1.5 rounded-lg text-[0.7rem] font-semibold text-slate-600 transition-colors text-center whitespace-nowrap"
+                          aria-pressed="false">
                           50/50
                         </button>
                       </div>
-                      <button type="button" id="btn-share-action" class="text-[0.68rem] font-semibold text-[var(--primary)] hover:text-[var(--primary-700)] focus:outline-none self-start">
+                      <button type="button" id="btn-share-action"
+                        class="text-[0.68rem] font-semibold text-[var(--primary)] hover:text-[var(--primary-700)] focus:outline-none self-start">
                         Según ingresos
                       </button>
-                      <p class="text-[0.68rem] text-slate-600 leading-snug">Lo que te corresponde del total. Calculamos el resto automáticamente.</p>
+                      <p class="text-[0.68rem] text-slate-600 leading-snug">Lo que te corresponde del total. Calculamos
+                        el resto automáticamente.</p>
                     </div>
                   </div>
                 </div>
@@ -310,11 +337,14 @@
               <div>
                 <span class="block text-sm font-medium text-slate-600 mb-1">¿Quién adelantó el pago?</span>
                 <div class="grid grid-cols-2 gap-2">
-                  <label class="flex items-center gap-2 text-sm font-medium text-slate-600 border border-slate-300 rounded-lg px-3 py-2 cursor-pointer hover:border-indigo-500">
-                    <input type="radio" name="debt-payer" value="me" class="text-indigo-600 focus:ring-indigo-500" checked>
+                  <label
+                    class="flex items-center gap-2 text-sm font-medium text-slate-600 border border-slate-300 rounded-lg px-3 py-2 cursor-pointer hover:border-indigo-500">
+                    <input type="radio" name="debt-payer" value="me" class="text-indigo-600 focus:ring-indigo-500"
+                      checked>
                     Yo
                   </label>
-                  <label class="flex items-center gap-2 text-sm font-medium text-slate-600 border border-slate-300 rounded-lg px-3 py-2 cursor-pointer hover:border-indigo-500">
+                  <label
+                    class="flex items-center gap-2 text-sm font-medium text-slate-600 border border-slate-300 rounded-lg px-3 py-2 cursor-pointer hover:border-indigo-500">
                     <input type="radio" name="debt-payer" value="partner" class="text-indigo-600 focus:ring-indigo-500">
                     Mi pareja
                   </label>
@@ -323,27 +353,36 @@
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label for="debt-installments" class="block text-sm font-medium text-slate-600 mb-1">Número de cuotas</label>
-                  <input type="number" id="debt-installments" class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200" value="5" min="1" step="1" required>
+                  <label for="debt-installments" class="block text-sm font-medium text-slate-600 mb-1">Número de
+                    cuotas</label>
+                  <input type="number" id="debt-installments"
+                    class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
+                    value="5" min="1" step="1" required>
                 </div>
                 <div>
-                  <label for="debt-first-date" class="block text-sm font-medium text-slate-600 mb-1">Fecha de inicio</label>
-                  <input type="date" id="debt-first-date" class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200">
+                  <label for="debt-first-date" class="block text-sm font-medium text-slate-600 mb-1">Fecha de
+                    inicio</label>
+                  <input type="date" id="debt-first-date"
+                    class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200">
                 </div>
               </div>
 
               <div>
                 <label for="debt-note" class="block text-sm font-medium text-slate-600 mb-1">Notas (opcional)</label>
-                <textarea id="debt-note" rows="2" class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200" placeholder="Detalle extra o condiciones del pago..."></textarea>
+                <textarea id="debt-note" rows="2"
+                  class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
+                  placeholder="Detalle extra o condiciones del pago..."></textarea>
               </div>
 
-              <div class="rounded-xl bg-slate-50 border border-dashed border-slate-300 p-3 text-sm text-slate-600" id="debt-preview">
+              <div class="rounded-xl bg-slate-50 border border-dashed border-slate-300 p-3 text-sm text-slate-600"
+                id="debt-preview">
                 Registra el total y tu parte para calcular cuánto queda pendiente.
               </div>
 
               <p id="debt-error" class="text-sm text-rose-600"></p>
 
-              <button type="submit" class="w-full inline-flex justify-center items-center gap-2 rounded-xl bg-[var(--primary)] text-white font-semibold py-2 shadow hover:bg-[var(--primary-700)] transition">
+              <button type="submit"
+                class="w-full inline-flex justify-center items-center gap-2 rounded-xl bg-[var(--primary)] text-slate-800 font-semibold py-2 shadow hover:bg-[var(--primary-700)] transition">
                 Guardar reembolso
               </button>
             </form>
@@ -375,8 +414,9 @@
               <label for="split-total" class="block text-sm font-medium text-slate-600 mb-1">Importe total</label>
               <div class="relative">
                 <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">€</span>
-                <input type="number" id="split-total" class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100"
-                       placeholder="120" value="60" step="0.01" min="0" inputmode="decimal">
+                <input type="number" id="split-total"
+                  class="pl-7 w-full rounded-lg border border-slate-300 py-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100"
+                  placeholder="120" value="60" step="0.01" min="0" inputmode="decimal">
               </div>
             </div>
 
@@ -392,8 +432,9 @@
 
             <div>
               <label for="split-count" class="block text-sm font-medium text-slate-600 mb-1">¿Cuántas personas?</label>
-              <input type="number" id="split-count" class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100"
-                     value="2" min="1" step="1">
+              <input type="number" id="split-count"
+                class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100"
+                value="2" min="1" step="1">
               <p class="text-xs text-slate-500 mt-1.5">Incluye a todos los que comparten el gasto.</p>
             </div>
           </div>
@@ -405,7 +446,8 @@
             <p id="split-amount-each" class="text-4xl font-extrabold text-slate-900">0,00 €</p>
             <p id="split-context" class="text-sm text-slate-500 mt-1">Divide al instante cualquier gasto.</p>
           </div>
-          <div class="rounded-xl bg-slate-50 border border-dashed border-slate-200 p-4 text-sm text-slate-600" id="split-detail">
+          <div class="rounded-xl bg-slate-50 border border-dashed border-slate-200 p-4 text-sm text-slate-600"
+            id="split-detail">
             Introduce el total y el número de personas para ver el reparto.
           </div>
           <p id="split-remainder" class="text-xs text-amber-600"></p>
@@ -425,4 +467,5 @@
   <!-- App principal -->
   <script type="module" src="./js/app.js"></script>
 </body>
+
 </html>

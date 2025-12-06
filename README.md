@@ -18,7 +18,7 @@ Funciona en navegador, se puede **instalar como app** (PWA) y **sincroniza autom
 
 ## 🔗 Demo
 
-- GitHub Pages: **https://queridojavier.github.io/finanzas-pareja/**
+- Deploy: **https://amedias.netlify.app**
   (Si clonas el proyecto, tu URL será `https://TU_USUARIO.github.io/NOMBRE_DEL_REPO/`)
 
 ## ✨ Funcionalidades

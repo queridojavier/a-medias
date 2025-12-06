@@ -47,7 +47,7 @@ Netlify debería detectar automáticamente la configuración del archivo `netlif
 
 1. Haz clic en **"Deploy site"** o simplemente haz push a tu repositorio
 2. Netlify construirá tu sitio automáticamente
-3. En unos segundos tendrás tu URL (ej: `https://tu-app.netlify.app`)
+3. En unos segundos tendrás tu URL (ej: `https://amedias.netlify.app`)
 
 ## Paso 5: Verificar
 

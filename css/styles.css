@@ -1,13 +1,13 @@
 /* styles.css - Estilos principales de A Medias */
 
 :root {
-  /* Nueva Paleta "A Medias" */
-  --primary: #E07A5F;
-  /* Burnt Peach */
-  --primary-700: #C66045;
-  /* Version oscura de Burnt Peach */
-  --secondary: #81B29A;
-  /* Muted Teal */
+  /* Nueva Paleta "A Medias" Refinada */
+  --primary: #81B29A;
+  /* Muted Teal (Ahora Primario) */
+  --primary-700: #5E8C76;
+  /* Muted Teal Oscuro */
+  --secondary: #E07A5F;
+  /* Burnt Peach (Ahora Secundario) */
   --accent: #F2CC8F;
   /* Apricot Cream */
   --ink: #3D405B;
@@ -16,9 +16,9 @@
   /* Eggshell - Fondo principal */
 
   --muted: #EAE6D2;
-  /* Eggshell oscurecido para bordes/divisores */
+  /* Eggshell oscurecido */
   --card: #FFFFFF;
-  /* Blanco puro para tarjetas */
+  /* Blanco puro */
 }
 
 body {
@@ -75,9 +75,10 @@ body {
 
 .tab-button-active {
   background: var(--primary);
-  color: #ffffff;
-  box-shadow: 0 10px 24px rgba(224, 122, 95, .32);
-  /* Shadow basada en Burnt Peach */
+  color: var(--ink);
+  /* Texto oscuro para mejor contraste con Teal */
+  box-shadow: 0 10px 24px rgba(129, 178, 154, .32);
+  /* Shadow basada en Muted Teal */
 }
 
 /* Chip buttons */
@@ -93,11 +94,12 @@ body {
 }
 
 .chip-button-active {
-  background: rgba(224, 122, 95, .15);
-  /* Burnt Peach con opacidad */
+  background: rgba(129, 178, 154, .15);
+  /* Muted Teal con opacidad */
   border-color: var(--primary);
-  color: var(--primary);
-  box-shadow: 0 6px 18px rgba(224, 122, 95, .2);
+  color: var(--ink);
+  /* Texto oscuro */
+  box-shadow: 0 6px 18px rgba(129, 178, 154, .2);
 }
 
 /* Loading spinner */
@@ -187,8 +189,8 @@ input:focus,
 textarea:focus,
 button:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(224, 122, 95, 0.2);
-  /* Burnt Peach focus ring */
+  box-shadow: 0 0 0 3px rgba(129, 178, 154, 0.4);
+  /* Muted Teal focus ring */
 }
 
 /* Skeleton loading */
