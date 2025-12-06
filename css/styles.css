@@ -1,22 +1,22 @@
 /* styles.css - Estilos principales de A Medias */
 
 :root {
-  /* Nueva Paleta "A Medias" Refinada */
-  --primary: #81B29A;
-  /* Muted Teal (Ahora Primario) */
-  --primary-700: #5E8C76;
-  /* Muted Teal Oscuro */
-  --secondary: #E07A5F;
-  /* Burnt Peach (Ahora Secundario) */
-  --accent: #F2CC8F;
-  /* Apricot Cream */
-  --ink: #3D405B;
-  /* Twilight Indigo - Texto principal */
-  --bg: #F4F1DE;
-  /* Eggshell - Fondo principal */
+  /* Paleta "A Medias" - Estilo Fintech Moderno */
+  --primary: #6366F1;
+  /* Indigo */
+  --primary-700: #4F46E5;
+  /* Indigo Oscuro */
+  --secondary: #10B981;
+  /* Emerald para éxito */
+  --accent: #F59E0B;
+  /* Amber para alertas */
+  --ink: #1E293B;
+  /* Slate 800 - Texto principal */
+  --bg: #FFFFFF;
+  /* Blanco puro - Fondo */
 
-  --muted: #EAE6D2;
-  /* Eggshell oscurecido */
+  --muted: #E2E8F0;
+  /* Slate 200 - Bordes */
   --card: #FFFFFF;
   /* Blanco puro */
 }
@@ -32,8 +32,7 @@ body {
   background: var(--card);
   border-radius: 16px;
   border: 1px solid var(--muted);
-  box-shadow: 0 8px 24px rgba(61, 64, 91, .06);
-  /* Shadow basada en Twilight Indigo */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .05);
   padding: 1.25rem;
 }
 
@@ -53,12 +52,11 @@ body {
 }
 
 /* Badge success */
-/* Badge success */
 .badge-success {
-  background: rgba(129, 178, 154, .2);
-  /* Muted Teal con opacidad */
-  color: #2D5C49;
-  /* Teal oscuro para texto */
+  background: rgba(16, 185, 129, .15);
+  /* Emerald con opacidad */
+  color: #059669;
+  /* Emerald oscuro */
   padding: .15rem .5rem;
   border-radius: .5rem;
 }
@@ -75,10 +73,10 @@ body {
 
 .tab-button-active {
   background: var(--primary);
-  color: var(--ink);
-  /* Texto oscuro para mejor contraste con Teal */
-  box-shadow: 0 10px 24px rgba(129, 178, 154, .32);
-  /* Shadow basada en Muted Teal */
+  color: #FFFFFF;
+  /* Texto blanco sobre índigo */
+  box-shadow: 0 10px 24px rgba(99, 102, 241, .25);
+  /* Shadow índigo */
 }
 
 /* Chip buttons */
@@ -94,18 +92,16 @@ body {
 }
 
 .chip-button-active {
-  background: rgba(129, 178, 154, .15);
-  /* Muted Teal con opacidad */
+  background: rgba(99, 102, 241, .1);
+  /* Índigo con opacidad */
   border-color: var(--primary);
-  color: var(--ink);
-  /* Texto oscuro */
-  box-shadow: 0 6px 18px rgba(129, 178, 154, .2);
+  color: var(--primary);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, .15);
 }
 
 /* Loading spinner */
 .spinner {
-  border: 2px solid rgba(61, 64, 91, 0.1);
-  /* Base del spinner basada en Ink */
+  border: 2px solid var(--muted);
   border-top-color: var(--primary);
   border-radius: 50%;
   width: 1rem;
@@ -132,16 +128,16 @@ body {
 }
 
 .sync-indicator.synced {
-  background: rgba(129, 178, 154, .2);
-  /* Muted Teal con opacidad */
-  color: #2D5C49;
-  /* Teal oscuro para texto */
+  background: rgba(16, 185, 129, .12);
+  /* Emerald */
+  color: #059669;
 }
 
 .sync-indicator.saving,
 .sync-indicator.loading {
-  background: rgba(59, 130, 246, .12);
-  color: #1e40af;
+  background: rgba(99, 102, 241, .12);
+  /* Índigo */
+  color: #4F46E5;
 }
 
 .sync-indicator.error {
@@ -167,9 +163,9 @@ body {
   left: 0;
   right: 0;
   background: var(--accent);
-  /* Apricot Cream */
-  color: #7D5A28;
-  /* Marrón oscuro para contraste con Apricot */
+  /* Amber */
+  color: #92400E;
+  /* Amber oscuro */
   padding: 0.5rem;
   text-align: center;
   font-size: 0.875rem;
@@ -189,8 +185,8 @@ input:focus,
 textarea:focus,
 button:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(129, 178, 154, 0.4);
-  /* Muted Teal focus ring */
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  /* Índigo focus ring */
 }
 
 /* Skeleton loading */
