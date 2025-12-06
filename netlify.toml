@@ -1,0 +1,41 @@
+# Configuración de Netlify para A Medias
+# https://docs.netlify.com/configure-builds/file-based-configuration/
+
+[build]
+  # Comando de build - genera config.js desde variables de entorno
+  command = "chmod +x build.sh && ./build.sh"
+  
+  # Directorio a publicar (el mismo directorio raíz)
+  publish = "."
+
+# Headers de seguridad
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Cache para assets estáticos
+[[headers]]
+  for = "/icons/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+# Redirección para PWA (SPA fallback)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  conditions = {Role = ["admin"]}

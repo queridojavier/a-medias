@@ -143,7 +143,23 @@ cp config.example.js config.js
 
 Para instrucciones detalladas paso a paso con capturas y solución de problemas, consulta **[SUPABASE_SETUP.md](./SUPABASE_SETUP.md)**
 
-## 🌐 Despliegue en GitHub Pages
+## 🌐 Despliegue
+
+### Opción 1: Netlify (Recomendada) ⭐
+
+Netlify permite configurar las credenciales de Supabase como **variables de entorno seguras**, sin exponerlas en el código.
+
+1. Conecta tu repositorio a [Netlify](https://netlify.com)
+2. Configura las variables de entorno en el dashboard:
+   - `SUPABASE_URL`: Tu URL de Supabase
+   - `SUPABASE_ANON_KEY`: Tu clave anon/public
+3. Despliega automáticamente
+
+👉 **Guía completa**: [NETLIFY_DEPLOY.md](./NETLIFY_DEPLOY.md)
+
+### Opción 2: GitHub Pages
+
+> ⚠️ Con GitHub Pages necesitarás que cada usuario configure sus propias credenciales manualmente.
 
 1. Sube los archivos a tu repositorio (rama `main`)
 2. Ve a **Settings → Pages**
