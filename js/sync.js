@@ -1,9 +1,12 @@
 // sync.js - Sistema de sincronización con Supabase mejorado
 
-import { getSupabaseConfig } from './constants.js';
-import { SYNC_STATUS, TIMINGS } from './constants.js';
-import { hashObject, randomToken, isOnline } from './utils.js';
+import { getSupabaseConfig, SYNC_STATUS, TIMINGS } from './constants.js';
+import { hashObject, randomToken, isOnline, logger } from './utils.js';
 import toast from './toast.js';
+
+// Configuración de reintentos
+const MAX_RETRIES = 3;
+const BASE_RETRY_DELAY = 2000; // 2 segundos base
 
 class SyncManager {
   constructor() {
@@ -14,10 +17,30 @@ class SyncManager {
     this.status = SYNC_STATUS.IDLE;
     this.pollTimer = null;
     this.saveTimer = null;
+    this.retryTimer = null;
+    this.retryCount = 0;
     this.isApplyingRemote = false;
     this.config = getSupabaseConfig();
     this.onStateChange = null; // Callback cuando cambia el estado remoto
     this.onStatusChange = null; // Callback cuando cambia el status de sync
+  }
+
+  /**
+   * Calcula el delay con exponential backoff
+   */
+  getRetryDelay() {
+    return Math.min(BASE_RETRY_DELAY * Math.pow(2, this.retryCount), 30000); // máximo 30s
+  }
+
+  /**
+   * Resetea el contador de reintentos
+   */
+  resetRetries() {
+    this.retryCount = 0;
+    if (this.retryTimer) {
+      clearTimeout(this.retryTimer);
+      this.retryTimer = null;
+    }
   }
 
   /**
@@ -103,7 +126,7 @@ class SyncManager {
         toast.success('Conectado al enlace compartido');
         return true;
       } catch (error) {
-        console.error('[Sync] Error inicializando desde URL:', error);
+        logger.error('[Sync] Error inicializando desde URL:', error);
         toast.error('No se pudo cargar el enlace compartido');
         this.clearShare();
         return false;
@@ -164,7 +187,7 @@ class SyncManager {
       toast.success('Enlace compartido creado correctamente');
       return this.buildShareLink();
     } catch (error) {
-      console.error('[Sync] Error creando share:', error);
+      logger.error('[Sync] Error creando share:', error);
       this.setStatus(SYNC_STATUS.ERROR);
       toast.error('No se pudo crear el enlace. Verifica tu configuración de Supabase');
       return false;
@@ -238,21 +261,33 @@ class SyncManager {
       }
 
       this.setStatus(SYNC_STATUS.SYNCED);
+      this.resetRetries();
       return payload;
     } catch (error) {
-      console.error('[Sync] Error fetching remote state:', error);
+      logger.error('[Sync] Error fetching remote state:', error);
       this.setStatus(SYNC_STATUS.ERROR);
 
-      if (!silent) {
-        toast.error('Error al sincronizar. Reintentando...');
-      }
+      // Reintentar con exponential backoff hasta MAX_RETRIES
+      if (this.retryCount < MAX_RETRIES) {
+        const delay = this.getRetryDelay();
+        this.retryCount++;
 
-      // Reintentar después de un delay
-      setTimeout(() => {
-        if (this.status === SYNC_STATUS.ERROR) {
-          this.fetchRemoteState(true);
+        if (!silent) {
+          toast.error(`Error al sincronizar. Reintentando en ${Math.round(delay / 1000)}s...`);
         }
-      }, TIMINGS.RETRY_DELAY);
+
+        this.retryTimer = setTimeout(() => {
+          this.retryTimer = null;
+          if (this.status === SYNC_STATUS.ERROR) {
+            this.fetchRemoteState(true);
+          }
+        }, delay);
+      } else {
+        if (!silent) {
+          toast.error('No se pudo sincronizar después de varios intentos');
+        }
+        this.resetRetries();
+      }
 
       return null;
     }
@@ -298,18 +333,28 @@ class SyncManager {
       this.lastHash = hashObject(currentState);
       this.lastSyncedAt = data?.[0]?.updated_at ? new Date(data[0].updated_at) : new Date();
       this.setStatus(SYNC_STATUS.SYNCED);
+      this.resetRetries();
 
       return true;
     } catch (error) {
-      console.error('[Sync] Error guardando estado remoto:', error);
+      logger.error('[Sync] Error guardando estado remoto:', error);
       this.setStatus(SYNC_STATUS.ERROR);
 
-      // Reintentar después de un delay
-      setTimeout(() => {
-        if (this.status === SYNC_STATUS.ERROR) {
-          this.queueSave(currentState);
-        }
-      }, TIMINGS.RETRY_DELAY);
+      // Reintentar con exponential backoff hasta MAX_RETRIES
+      if (this.retryCount < MAX_RETRIES) {
+        const delay = this.getRetryDelay();
+        this.retryCount++;
+
+        this.retryTimer = setTimeout(() => {
+          this.retryTimer = null;
+          if (this.status === SYNC_STATUS.ERROR) {
+            this.queueSave(currentState);
+          }
+        }, delay);
+      } else {
+        toast.error('No se pudieron guardar los cambios. Verifica tu conexión');
+        this.resetRetries();
+      }
 
       return false;
     }

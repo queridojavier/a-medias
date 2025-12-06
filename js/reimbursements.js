@@ -1,7 +1,7 @@
 // reimbursements.js - Módulo de gestión de reembolsos
 
 import { STORAGE_KEYS, SPLIT_MODES } from './constants.js';
-import { formatMoney, round2, generateUUID, todayISO, escapeHtml, getElement, readNumber, storage } from './utils.js';
+import { formatMoney, round2, generateUUID, todayISO, escapeHtml, getElement, readNumber, storage, calculateProportion } from './utils.js';
 import toast from './toast.js';
 
 class ReimbursementsManager {
@@ -82,10 +82,7 @@ class ReimbursementsManager {
 
     if (calculatedMode === SPLIT_MODES.PROPORTIONAL && incomes) {
       const { nomina1, nomina2 } = incomes;
-      const ingresoTotal = nomina1 + nomina2;
-      if (ingresoTotal > 0) {
-        proportion = Math.min(1, Math.max(0, nomina1 / ingresoTotal));
-      }
+      proportion = calculateProportion(nomina1, nomina2);
     }
 
     const computedShare = Math.min(total, round2(total * proportion));
@@ -465,10 +462,14 @@ class ReimbursementsManager {
     return this.normalizeReimbursements(this.reimbursements);
   }
 
-  restoreState(reimbursements) {
+  restoreState(reimbursements, { skipSync = false } = {}) {
     if (Array.isArray(reimbursements)) {
       this.reimbursements = this.normalizeReimbursements(reimbursements);
-      this.saveReimbursements();
+      // Guardar en localStorage sin disparar sincronización remota
+      storage.set(STORAGE_KEYS.REIMBURSEMENTS, this.reimbursements);
+      if (!skipSync && this.onStateChange) {
+        this.onStateChange();
+      }
       this.renderReimbursements();
     }
   }

@@ -1,7 +1,7 @@
 // calculator.js - Módulo de calculadora de división mensual
 
-import { SPLIT_MODES, DEFAULTS, STORAGE_KEYS } from './constants.js';
-import { formatMoney, formatPercent, round2, readNumber, getElement, storage } from './utils.js';
+import { SPLIT_MODES, DEFAULTS, STORAGE_KEYS, TIMINGS } from './constants.js';
+import { formatMoney, formatPercent, round2, readNumber, getElement, storage, calculateProportion, debounce } from './utils.js';
 import syncManager from './sync.js';
 
 class Calculator {
@@ -10,6 +10,8 @@ class Calculator {
     this.defaultValues = { ...DEFAULTS };
     this.elements = {};
     this.onStateChange = null; // Callback cuando cambia el estado
+    // Versión con debounce del cálculo para mejor rendimiento
+    this.debouncedCalculate = debounce(() => this.calculate(), TIMINGS.CALC_DEBOUNCE);
   }
 
   /**
@@ -59,7 +61,7 @@ class Calculator {
       const element = this.elements[id];
       if (element) {
         element.addEventListener('input', () => {
-          this.calculate();
+          this.debouncedCalculate();
         });
       }
     });
@@ -131,11 +133,9 @@ class Calculator {
     const ingresoTotal = round2(nomina1 + nomina2);
 
     // Calcular porcentaje según modo
-    let proportion1 = this.mode === SPLIT_MODES.EQUAL
+    const proportion1 = this.mode === SPLIT_MODES.EQUAL
       ? 0.5
-      : (ingresoTotal > 0 ? nomina1 / ingresoTotal : 0.5);
-
-    proportion1 = Math.min(1, Math.max(0, proportion1));
+      : calculateProportion(nomina1, nomina2);
 
     const comun1 = round2(fondoComun * proportion1);
     const comun2 = round2(fondoComun * (1 - proportion1));

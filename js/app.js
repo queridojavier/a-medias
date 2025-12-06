@@ -1,7 +1,7 @@
 // app.js - Punto de entrada principal de la aplicación
 
 import { TABS, STORAGE_KEYS, SYNC_STATUS, DATA_VERSION } from './constants.js';
-import { getElement, storage, copyToClipboard, isOnline, formatDateTime } from './utils.js';
+import { getElement, storage, copyToClipboard, isOnline, formatDateTime, logger } from './utils.js';
 import toast from './toast.js';
 import syncManager from './sync.js';
 import Calculator from './calculator.js';
@@ -18,7 +18,7 @@ class App {
   }
 
   async init() {
-    console.log('[A Medias] Inicializando aplicación v2.0');
+    logger.log('[A Medias] Inicializando aplicación v2.0');
 
     // Migrar datos si es necesario
     this.migrateDataIfNeeded();
@@ -46,7 +46,7 @@ class App {
     // Registrar Service Worker
     this.registerServiceWorker();
 
-    console.log('[A Medias] Aplicación lista');
+    logger.log('[A Medias] Aplicación lista');
   }
 
   cacheElements() {
@@ -86,7 +86,7 @@ class App {
     const currentVersion = storage.get(STORAGE_KEYS.STATE_VERSION, 1);
 
     if (currentVersion < DATA_VERSION) {
-      console.log(`[A Medias] Migrando datos de v${currentVersion} a v${DATA_VERSION}`);
+      logger.log(`[A Medias] Migrando datos de v${currentVersion} a v${DATA_VERSION}`);
 
       // Migración de v1 a v2: renombrar key antigua
       if (currentVersion === 1) {
@@ -103,7 +103,7 @@ class App {
       }
 
       storage.set(STORAGE_KEYS.STATE_VERSION, DATA_VERSION);
-      console.log('[A Medias] Migración completada');
+      logger.log('[A Medias] Migración completada');
     }
   }
 
@@ -356,16 +356,16 @@ class App {
   handleRemoteStateChange(remoteState) {
     if (!remoteState || typeof remoteState !== 'object') return;
 
-    console.log('[A Medias] Aplicando estado remoto');
+    logger.log('[A Medias] Aplicando estado remoto');
 
     // Restaurar estado de calculadora
     if (remoteState.calc) {
       this.calculator.restoreState(remoteState.calc);
     }
 
-    // Restaurar reembolsos
+    // Restaurar reembolsos (skipSync=true para evitar sincronización circular)
     if (Array.isArray(remoteState.reimbursements)) {
-      this.reimbursements.restoreState(remoteState.reimbursements);
+      this.reimbursements.restoreState(remoteState.reimbursements, { skipSync: true });
     }
 
     // Cambiar de tab si es necesario
@@ -417,8 +417,8 @@ class App {
     if ('serviceWorker' in navigator && !isDevHost) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-          .then(() => console.log('[A Medias] Service Worker registrado'))
-          .catch((err) => console.error('[A Medias] Error registrando SW:', err));
+          .then(() => logger.log('[A Medias] Service Worker registrado'))
+          .catch((err) => logger.error('[A Medias] Error registrando SW:', err));
       });
     } else if (isDevHost) {
       // En desarrollo, desregistrar SWs previos

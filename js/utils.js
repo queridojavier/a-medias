@@ -1,6 +1,19 @@
 // utils.js - Funciones de utilidad
 
 /**
+ * Logger condicional que solo muestra mensajes en desarrollo
+ */
+const isDev = ['localhost', '127.0.0.1'].includes(location?.hostname) ||
+  location?.hostname?.startsWith('192.168.');
+
+export const logger = {
+  log: (...args) => isDev && console.log(...args),
+  warn: (...args) => isDev && console.warn(...args),
+  error: (...args) => console.error(...args), // Errores siempre visibles
+  info: (...args) => isDev && console.info(...args),
+};
+
+/**
  * Formatea un número como moneda EUR
  */
 export const formatMoney = (amount) => {
@@ -27,6 +40,18 @@ export const formatPercent = (value) => {
  */
 export const round2 = (value) => {
   return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
+};
+
+/**
+ * Calcula la proporción de ingresos para reparto
+ * @param {number} income1 - Primer ingreso
+ * @param {number} income2 - Segundo ingreso
+ * @returns {number} Proporción del primer ingreso (entre 0 y 1)
+ */
+export const calculateProportion = (income1, income2) => {
+  const total = income1 + income2;
+  if (total <= 0) return 0.5;
+  return Math.min(1, Math.max(0, income1 / total));
 };
 
 /**
@@ -181,30 +206,6 @@ export const hashObject = (obj) => {
     return JSON.stringify(obj ?? {});
   } catch {
     return '';
-  }
-};
-
-/**
- * Valida que un email tenga formato válido
- */
-export const isValidEmail = (email) => {
-  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return re.test(String(email).toLowerCase());
-};
-
-/**
- * Formatea una fecha ISO en formato legible español
- */
-export const formatDate = (isoDate) => {
-  try {
-    const date = new Date(isoDate);
-    return new Intl.DateTimeFormat('es-ES', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    }).format(date);
-  } catch {
-    return isoDate;
   }
 };
 

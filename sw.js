@@ -34,36 +34,27 @@ self.addEventListener('activate', event => {
   );
 });
 
+// Estrategia cache-first con revalidación en segundo plano
+const cacheFirstWithRevalidate = (req) => {
+  return caches.match(req).then(cached => {
+    const fetchPromise = fetch(req).then(res => {
+      if (res.ok) {
+        caches.open(CACHE).then(cache => cache.put(req, res.clone()));
+      }
+      return res;
+    }).catch(() => cached);
+    return cached || fetchPromise;
+  });
+};
+
 self.addEventListener('fetch', event => {
   const req = event.request;
   if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
 
-  // Origen propio: cache-first con actualización en segundo plano
-  if (url.origin === location.origin) {
-    event.respondWith(
-      caches.match(req).then(cached => {
-        const fetchPromise = fetch(req).then(res => {
-          caches.open(CACHE).then(cache => cache.put(req, res.clone()));
-          return res;
-        }).catch(() => cached);
-        return cached || fetchPromise;
-      })
-    );
-    return;
-  }
-
-  // CDNs permitidos: cache stale-while-revalidate
-  if (ALLOWED_CDN.includes(url.hostname)) {
-    event.respondWith(
-      caches.match(req).then(cached => {
-        const fetchPromise = fetch(req).then(res => {
-          caches.open(CACHE).then(cache => cache.put(req, res.clone()));
-          return res;
-        }).catch(() => cached);
-        return cached || fetchPromise;
-      })
-    );
+  // Origen propio o CDNs permitidos: cache-first con revalidación
+  if (url.origin === location.origin || ALLOWED_CDN.includes(url.hostname)) {
+    event.respondWith(cacheFirstWithRevalidate(req));
   }
 });
