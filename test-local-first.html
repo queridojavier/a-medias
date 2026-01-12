@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test Local First - A Medias</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 p-8">
+  <div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6">Test Local First System</h1>
+
+    <div class="bg-white rounded-xl shadow p-6 mb-6">
+      <h2 class="text-xl font-semibold mb-4">1. Guardar datos</h2>
+      <input type="text" id="test-input"
+        class="w-full border rounded px-3 py-2 mb-3"
+        placeholder="Escribe algo...">
+      <button onclick="saveData()"
+        class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+        Guardar
+      </button>
+      <p id="save-status" class="text-sm text-slate-600 mt-2"></p>
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-6 mb-6">
+      <h2 class="text-xl font-semibold mb-4">2. Cargar datos</h2>
+      <button onclick="loadData()"
+        class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+        Cargar
+      </button>
+      <p id="load-result" class="text-sm text-slate-600 mt-2"></p>
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-6 mb-6">
+      <h2 class="text-xl font-semibold mb-4">3. Crear URL para compartir</h2>
+      <button onclick="createShareURL()"
+        class="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700">
+        Crear URL
+      </button>
+      <div id="share-url-result" class="mt-3"></div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-6 mb-6">
+      <h2 class="text-xl font-semibold mb-4">4. Leer desde URL</h2>
+      <button onclick="readFromURL()"
+        class="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700">
+        Leer URL actual
+      </button>
+      <p id="read-url-result" class="text-sm text-slate-600 mt-2"></p>
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-6">
+      <h2 class="text-xl font-semibold mb-4">5. Estadísticas</h2>
+      <button onclick="getStats()"
+        class="bg-slate-600 text-white px-4 py-2 rounded hover:bg-slate-700">
+        Ver estadísticas
+      </button>
+      <pre id="stats-result" class="text-xs text-slate-600 mt-3 bg-slate-50 p-3 rounded"></pre>
+    </div>
+  </div>
+
+  <script type="module">
+    import localStorage from './js/storage-local.js';
+    import urlShareManager from './js/share-url.js';
+
+    window.localStorage = localStorage;
+    window.urlShareManager = urlShareManager;
+
+    window.saveData = async function() {
+      const input = document.getElementById('test-input');
+      const status = document.getElementById('save-status');
+
+      const data = {
+        message: input.value,
+        timestamp: new Date().toISOString(),
+        random: Math.random()
+      };
+
+      const success = await localStorage.save('test_data', data);
+      status.textContent = success ?
+        '✅ Guardado correctamente en IndexedDB' :
+        '❌ Error al guardar';
+      status.className = success ? 'text-green-600 mt-2' : 'text-red-600 mt-2';
+    };
+
+    window.loadData = async function() {
+      const result = document.getElementById('load-result');
+
+      const data = await localStorage.load('test_data');
+
+      if (data) {
+        result.innerHTML = `
+          <strong>✅ Datos cargados:</strong><br>
+          Mensaje: ${data.message}<br>
+          Timestamp: ${data.timestamp}<br>
+          Random: ${data.random}
+        `;
+        result.className = 'text-green-600 mt-2 text-sm';
+      } else {
+        result.textContent = '❌ No hay datos guardados';
+        result.className = 'text-red-600 mt-2';
+      }
+    };
+
+    window.createShareURL = async function() {
+      const resultDiv = document.getElementById('share-url-result');
+
+      const data = {
+        test: 'Hola desde A Medias',
+        numbers: [1, 2, 3, 4, 5],
+        timestamp: new Date().toISOString()
+      };
+
+      const result = await urlShareManager.createShareURL(data);
+
+      if (result.success) {
+        resultDiv.innerHTML = `
+          <div class="text-green-600 text-sm mb-2">✅ URL creada (${result.size} caracteres)</div>
+          <input type="text" readonly value="${result.url}"
+            class="w-full border rounded px-3 py-2 text-xs bg-slate-50"
+            onclick="this.select()">
+          <button onclick="window.location.href='${result.url}'"
+            class="mt-2 bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">
+            Abrir URL
+          </button>
+        `;
+      } else {
+        resultDiv.innerHTML = `<div class="text-red-600 text-sm">❌ ${result.message}</div>`;
+      }
+    };
+
+    window.readFromURL = async function() {
+      const result = document.getElementById('read-url-result');
+
+      const urlResult = await urlShareManager.readShareURL();
+
+      if (urlResult.success) {
+        result.innerHTML = `
+          <strong>✅ Datos leídos desde URL:</strong><br>
+          <pre class="text-xs bg-slate-50 p-2 rounded mt-2">${JSON.stringify(urlResult.data, null, 2)}</pre>
+        `;
+        result.className = 'text-green-600 mt-2 text-sm';
+      } else {
+        result.textContent = `❌ ${urlResult.message}`;
+        result.className = 'text-red-600 mt-2';
+      }
+    };
+
+    window.getStats = async function() {
+      const result = document.getElementById('stats-result');
+
+      const stats = await localStorage.getStats();
+      const keys = await localStorage.listKeys();
+      const hasUrlData = urlShareManager.hasSharedData();
+
+      result.textContent = JSON.stringify({
+        storage: stats,
+        keys: keys,
+        hasSharedDataInURL: hasUrlData
+      }, null, 2);
+    };
+  </script>
+</body>
+</html>
