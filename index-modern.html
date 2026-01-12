@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A Medias - Gestión de gastos en pareja</title>
+
+  <!-- Tailwind por CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fuentes -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="icon" href="./icons/icon-192.png" type="image/png">
+  <meta name="apple-mobile-web-app-title" content="A Medias">
+  <meta name="theme-color" content="#6366F1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Gestiona y divide gastos en pareja de forma justa y transparente">
+
+  <!-- Estilos modernos -->
+  <link rel="stylesheet" href="./css/styles.css">
+  <link rel="stylesheet" href="./css/navigation.css">
+  <link rel="stylesheet" href="./css/components.css">
+</head>
+
+<body>
+  <!-- Sidebar (Desktop) -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <img src="./icons/icon-192.png" alt="Logo" class="sidebar-logo">
+      <h1 class="sidebar-title">A <span>Medias</span></h1>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="sidebar-item active" data-tab-target="calc">
+        <span class="sidebar-icon">📊</span>
+        División mensual
+      </button>
+      <button class="sidebar-item" data-tab-target="reimburse">
+        <span class="sidebar-icon">💸</span>
+        Reembolsos
+      </button>
+      <button class="sidebar-item" data-tab-target="split">
+        <span class="sidebar-icon">✂️</span>
+        Divisor rápido
+      </button>
+      <button class="sidebar-item" data-tab-target="share">
+        <span class="sidebar-icon">🔗</span>
+        Compartir
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-footer-item">
+        <span id="sync-indicator-sidebar" class="sync-indicator idle">
+          <span>Local</span>
+        </span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Bottom Navigation (Móvil) -->
+  <nav class="bottom-nav">
+    <div class="bottom-nav-container">
+      <button class="bottom-nav-item active" data-tab-target="calc">
+        <span class="bottom-nav-icon">📊</span>
+        <span class="bottom-nav-label">División</span>
+      </button>
+      <button class="bottom-nav-item" data-tab-target="reimburse">
+        <span class="bottom-nav-icon">💸</span>
+        <span class="bottom-nav-label">Reembolsos</span>
+      </button>
+      <button class="bottom-nav-item" data-tab-target="split">
+        <span class="bottom-nav-icon">✂️</span>
+        <span class="bottom-nav-label">Dividir</span>
+      </button>
+      <button class="bottom-nav-item" data-tab-target="share">
+        <span class="bottom-nav-icon">🔗</span>
+        <span class="bottom-nav-label">Compartir</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Banner offline -->
+  <div id="offline-banner" class="offline-banner" style="display: none;">
+    Sin conexión. Trabajando offline...
+  </div>
+
+  <!-- Main Content Wrapper -->
+  <div class="main-wrapper">
+    <div class="main-content">
+      <div class="max-w-7xl mx-auto p-4 md:p-8">
+
+        <!-- Header (solo móvil) -->
+        <div class="mobile-only mb-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <img src="./icons/icon-192.png" alt="Logo" class="w-10 h-10 rounded-xl shadow-md">
+              <h1 class="text-2xl font-extrabold">A <span style="color: var(--primary)">Medias</span></h1>
+            </div>
+            <span id="sync-indicator-mobile" class="sync-indicator idle">
+              <span>Local</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- TAB: División mensual -->
+        <section class="tab-section" data-tab-section="calc">
+          <div class="mb-6">
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-2">División mensual</h2>
+            <p class="text-slate-600">Calcula cómo repartir los gastos comunes según ingresos</p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Columna izquierda: Inputs -->
+            <div class="space-y-6">
+              <div class="card-modern">
+                <h3 class="text-lg font-semibold text-slate-900 mb-4">💰 Ingresos del mes</h3>
+
+                <!-- Toggle modo -->
+                <div class="mb-5">
+                  <label class="block text-sm font-semibold text-slate-700 mb-2">Modo de reparto</label>
+                  <div class="flex rounded-xl bg-slate-100 p-1 w-full">
+                    <button id="mode-prop" class="flex-1 px-3 py-2 rounded-lg text-sm font-semibold bg-white shadow text-slate-900 ring-2 ring-indigo-600">
+                      Proporcional
+                    </button>
+                    <button id="mode-eq" class="flex-1 px-3 py-2 rounded-lg text-sm font-semibold text-slate-700">
+                      50 / 50
+                    </button>
+                  </div>
+                  <p id="mode-hint" class="text-xs text-slate-500 mt-2">Reparte según el peso de cada nómina</p>
+                </div>
+
+                <!-- Inputs de ingresos -->
+                <div class="space-y-4">
+                  <div class="input-group">
+                    <label for="nomina1" class="block text-sm font-semibold text-slate-700 mb-1.5">Nómina Persona 1</label>
+                    <input type="number" id="nomina1" class="input-modern" placeholder="1800" value="1800">
+                  </div>
+                  <div class="input-group">
+                    <label for="nomina2" class="block text-sm font-semibold text-slate-700 mb-1.5">Nómina Persona 2</label>
+                    <input type="number" id="nomina2" class="input-modern" placeholder="1500" value="1500">
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-modern">
+                <h3 class="text-lg font-semibold text-slate-900 mb-4">🏠 Gastos comunes</h3>
+                <div class="space-y-4">
+                  <div class="input-group">
+                    <label for="fondo-comun" class="block text-sm font-semibold text-slate-700 mb-1.5">Fondo común total</label>
+                    <input type="number" id="fondo-comun" class="input-modern" placeholder="1200" value="1200">
+                  </div>
+                  <div class="input-group">
+                    <label for="ajuste" class="block text-sm font-semibold text-slate-700 mb-1.5">Ajuste mensual (opcional)</label>
+                    <input type="number" id="ajuste" class="input-modern" placeholder="0" value="0">
+                    <p class="text-xs text-slate-500 mt-1">+ suma al fondo, - resta del fondo</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Columna derecha: Resultados -->
+            <div class="space-y-6">
+              <div class="card-modern card-gradient">
+                <h3 class="text-lg font-semibold mb-4">📊 Resultados</h3>
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <p class="text-sm opacity-80 mb-1">Persona 1 aporta</p>
+                    <p id="aporte1" class="text-3xl font-bold">€0</p>
+                    <p id="porcentaje1" class="text-sm opacity-80 mt-1">50%</p>
+                  </div>
+                  <div>
+                    <p class="text-sm opacity-80 mb-1">Persona 2 aporta</p>
+                    <p id="aporte2" class="text-3xl font-bold">€0</p>
+                    <p id="porcentaje2" class="text-sm opacity-80 mt-1">50%</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-modern">
+                <h3 class="text-lg font-semibold text-slate-900 mb-4">💡 Desglose</h3>
+                <div id="calc-breakdown" class="space-y-3 text-sm">
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">Ingresos totales</span>
+                    <span class="font-semibold">€3,300</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">Gastos comunes</span>
+                    <span class="font-semibold">€1,200</span>
+                  </div>
+                  <div class="divider"></div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">Persona 1 libre</span>
+                    <span class="font-semibold text-green-600" id="libre1">€0</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-slate-600">Persona 2 libre</span>
+                    <span class="font-semibold text-green-600" id="libre2">€0</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB: Reembolsos -->
+        <section class="tab-section hidden" data-tab-section="reimburse">
+          <div class="mb-6">
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-2">Reembolsos pendientes</h2>
+            <p class="text-slate-600">Registra gastos que uno pagó y necesitan reembolso</p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Formulario -->
+            <div class="lg:col-span-1">
+              <div class="card-modern sticky top-6">
+                <h3 class="text-lg font-semibold text-slate-900 mb-4">➕ Nuevo reembolso</h3>
+                <form id="reimburse-form" class="space-y-4">
+                  <div>
+                    <label for="reimburse-desc" class="block text-sm font-semibold text-slate-700 mb-1.5">Descripción</label>
+                    <input type="text" id="reimburse-desc" class="input-modern" placeholder="Ej: Compra supermercado">
+                  </div>
+                  <div>
+                    <label for="reimburse-amount" class="block text-sm font-semibold text-slate-700 mb-1.5">Cantidad (€)</label>
+                    <input type="number" id="reimburse-amount" class="input-modern" placeholder="0.00" step="0.01">
+                  </div>
+                  <div>
+                    <label for="reimburse-payer" class="block text-sm font-semibold text-slate-700 mb-1.5">Quién pagó</label>
+                    <select id="reimburse-payer" class="input-modern">
+                      <option value="1">Persona 1</option>
+                      <option value="2">Persona 2</option>
+                    </select>
+                  </div>
+                  <button type="submit" class="btn btn-primary w-full">
+                    Añadir reembolso
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Lista de reembolsos -->
+            <div class="lg:col-span-2">
+              <div class="card-modern mb-6">
+                <h3 class="text-lg font-semibold text-slate-900 mb-1">Balance total</h3>
+                <p id="reimburse-balance" class="text-3xl font-bold text-slate-900">€0.00</p>
+                <p id="reimburse-balance-text" class="text-sm text-slate-600 mt-1">No hay reembolsos pendientes</p>
+              </div>
+
+              <div id="reimburse-list" class="space-y-3">
+                <!-- Los reembolsos se insertan aquí dinámicamente -->
+              </div>
+
+              <div id="reimburse-empty" class="empty-state">
+                <div class="empty-state-icon">📝</div>
+                <h3 class="empty-state-title">No hay reembolsos</h3>
+                <p class="empty-state-description">Añade un gasto que necesite ser reembolsado</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB: Divisor rápido -->
+        <section class="tab-section hidden" data-tab-section="split">
+          <div class="mb-6">
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-2">Divisor rápido</h2>
+            <p class="text-slate-600">Divide cualquier gasto entre varias personas</p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="card-modern">
+              <h3 class="text-lg font-semibold text-slate-900 mb-4">✂️ Dividir gasto</h3>
+              <div class="space-y-4">
+                <div>
+                  <label for="split-total" class="block text-sm font-semibold text-slate-700 mb-1.5">Cantidad total (€)</label>
+                  <input type="number" id="split-total" class="input-modern" placeholder="60.00" value="60" step="0.01">
+                </div>
+                <div>
+                  <label for="split-people" class="block text-sm font-semibold text-slate-700 mb-1.5">Número de personas</label>
+                  <input type="number" id="split-people" class="input-modern" placeholder="2" value="2" min="2">
+                </div>
+              </div>
+            </div>
+
+            <div class="card-modern card-gradient">
+              <h3 class="text-lg font-semibold mb-2">Resultado</h3>
+              <p class="text-sm opacity-80 mb-1">Cada persona paga</p>
+              <p id="split-result" class="text-5xl font-bold">€30.00</p>
+              <p id="split-detail" class="text-sm opacity-80 mt-3">€60.00 ÷ 2 personas</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB: Compartir -->
+        <section class="tab-section hidden" data-tab-section="share">
+          <div class="mb-6">
+            <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-2">Compartir y sincronizar</h2>
+            <p class="text-slate-600">Comparte tus datos con otro dispositivo</p>
+          </div>
+
+          <div class="max-w-2xl">
+            <div class="card-modern">
+              <h3 class="text-lg font-semibold text-slate-900 mb-2">🔗 Enlace compartido</h3>
+              <p class="text-sm text-slate-600 mb-4">Crea un enlace para compartir tus datos con otro dispositivo. No requiere registro ni servidor.</p>
+
+              <div id="share-status-wrapper">
+                <div class="flex items-center gap-2 mb-4">
+                  <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                  <span id="share-status-text" class="text-sm text-slate-600">Guardado localmente en este dispositivo</span>
+                </div>
+
+                <button id="share-create" class="btn btn-primary w-full">
+                  Crear enlace compartido
+                </button>
+
+                <div id="share-link-wrapper" class="hidden mt-4">
+                  <label class="block text-sm font-semibold text-slate-700 mb-2">Tu enlace compartido</label>
+                  <div class="flex gap-2">
+                    <input type="text" id="share-link-input" readonly class="input-modern flex-1 text-sm">
+                    <button id="share-copy" class="btn btn-secondary">Copiar</button>
+                  </div>
+                  <p class="text-xs text-slate-500 mt-2">Comparte este enlace para sincronizar datos con otro dispositivo</p>
+                  <button id="share-leave" class="btn btn-outline w-full mt-4">
+                    Dejar de compartir
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-modern mt-6">
+              <h3 class="text-lg font-semibold text-slate-900 mb-2">💾 Backup</h3>
+              <p class="text-sm text-slate-600 mb-4">Exporta o importa tus datos</p>
+              <div class="flex gap-3">
+                <button id="export-backup" class="btn btn-secondary flex-1">
+                  Exportar datos
+                </button>
+                <label class="btn btn-outline flex-1 cursor-pointer">
+                  Importar datos
+                  <input type="file" id="import-backup" accept=".json" class="hidden">
+                </label>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Configuración de Supabase (opcional - legacy) -->
+  <script src="./config.js"></script>
+
+  <!-- App principal (nuevo sistema Local First) -->
+  <script type="module" src="./js/app-hybrid.js"></script>
+
+  <script>
+    // Inicializar iconos Lucide (si se usa)
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  </script>
+</body>
+
+</html>
