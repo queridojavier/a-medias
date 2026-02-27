@@ -1,11 +1,7 @@
 # Configuración de Netlify para A Medias
-# https://docs.netlify.com/configure-builds/file-based-configuration/
 
 [build]
-  # Comando de build - genera config.js desde variables de entorno
-  command = "chmod +x build.sh && ./build.sh"
-  
-  # Directorio a publicar (el mismo directorio raíz)
+  # Sin build step - es HTML/CSS/JS puro
   publish = "."
 
 # Headers de seguridad
@@ -38,4 +34,3 @@
   from = "/*"
   to = "/index.html"
   status = 200
-
