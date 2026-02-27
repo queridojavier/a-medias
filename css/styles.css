@@ -1,194 +1,853 @@
-/* styles.css - Estilos principales de A Medias v3.0 */
+/* styles.css - A Medias v4.0 - iOS Native Style */
 
+/* ========================================
+   VARIABLES
+   ======================================== */
 :root {
-  /* Paleta "A Medias" - Estilo Fintech Moderno Pro */
-  --primary: #6366F1;
-  /* Indigo */
-  --primary-700: #4F46E5;
-  /* Indigo Oscuro */
-  --primary-light: #818CF8;
-  /* Indigo Claro */
-  --secondary: #10B981;
-  /* Emerald para éxito */
-  --accent: #F59E0B;
-  /* Amber para alertas */
-  --ink: #1E293B;
-  /* Slate 800 - Texto principal */
-  --bg: #F8FAFC;
-  /* Slate 50 - Fondo suave */
-  --bg-gradient: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
-
-  --muted: #E2E8F0;
-  /* Slate 200 - Bordes */
+  --primary: #007AFF;
+  --primary-dark: #0056CC;
+  --primary-light: #409CFF;
+  --primary-bg: rgba(0, 122, 255, 0.08);
+  --green: #34C759;
+  --green-bg: rgba(52, 199, 89, 0.08);
+  --orange: #FF9500;
+  --red: #FF3B30;
+  --ink: #1C1C1E;
+  --ink-secondary: #3C3C43;
+  --ink-tertiary: #8E8E93;
+  --bg: #F2F2F7;
   --card: #FFFFFF;
-  /* Blanco puro */
+  --separator: rgba(60, 60, 67, 0.12);
+  --muted: #C7C7CC;
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.08);
+  --radius-card: 14px;
+  --radius-input: 10px;
+  --radius-btn: 12px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --tab-bar-height: 83px;
+  --header-height: 52px;
+}
 
-  /* Sombras modernas */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 24px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.08);
-  --shadow-primary: 0 8px 24px rgba(99, 102, 241, 0.25);
+/* ========================================
+   BASE
+   ======================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-  /* Transiciones */
-  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  height: 100%;
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif;
   background: var(--bg);
   color: var(--ink);
-  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+  overflow: hidden;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 
-/* Cards */
-.card {
+/* ========================================
+   APP LAYOUT
+   ======================================== */
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 100dvh;
+}
+
+.app-header {
+  flex-shrink: 0;
+  padding: calc(var(--safe-top) + 8px) 16px 8px;
+  background: var(--bg);
+  z-index: 10;
+}
+
+.app-header-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.app-header-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+}
+
+.app-header-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.3px;
+}
+
+.app-header-title span {
+  color: var(--primary);
+}
+
+.app-main {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 16px 16px;
+  padding-bottom: calc(var(--tab-bar-height) + 16px);
+}
+
+.app-main > section {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* ========================================
+   TAB BAR (iOS Style)
+   ======================================== */
+.tab-bar {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  background: rgba(249, 249, 249, 0.94);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-top: 0.5px solid rgba(0, 0, 0, 0.12);
+  padding: 6px 0 calc(6px + var(--safe-bottom));
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  height: auto;
+}
+
+.tab-bar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 0;
+  min-width: 0;
+  flex: 1;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--ink-tertiary);
+  transition: color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  font-family: inherit;
+}
+
+.tab-bar-item.active {
+  color: var(--primary);
+}
+
+.tab-bar-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.tab-bar-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+/* ========================================
+   iOS CARDS
+   ======================================== */
+.ios-card {
   background: var(--card);
-  border-radius: 16px;
-  border: 1px solid var(--muted);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, .05);
-  padding: 1.25rem;
+  border-radius: var(--radius-card);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-card);
 }
 
-/* Result boxes */
-.result-box {
-  border-radius: 16px;
-  padding: 1.25rem;
+.ios-card-header {
+  margin-bottom: 16px;
+}
+
+.ios-card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.3px;
+}
+
+.ios-card-subtitle {
+  font-size: 14px;
+  color: var(--ink-tertiary);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* ========================================
+   iOS SEGMENT CONTROL
+   ======================================== */
+.ios-segment {
+  display: flex;
+  background: rgba(118, 118, 128, 0.12);
+  border-radius: 9px;
+  padding: 2px;
+  margin-bottom: 8px;
+}
+
+.ios-segment--small {
+  display: inline-flex;
+  margin-bottom: 4px;
+}
+
+.ios-segment-btn {
+  flex: 1;
+  padding: 7px 12px;
+  border: none;
+  background: none;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+
+.ios-segment-btn.active {
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+/* ========================================
+   FORMS
+   ======================================== */
+.ios-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ios-form-group {
+  margin-bottom: 12px;
+}
+
+.ios-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.ios-form-row .ios-form-group {
+  margin-bottom: 0;
+}
+
+.ios-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-secondary);
+  margin-bottom: 6px;
+}
+
+.ios-input-wrapper {
+  position: relative;
+}
+
+.ios-input-prefix {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink-tertiary);
+  pointer-events: none;
+}
+
+.ios-input {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-input);
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--ink);
+  background: var(--card);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+  -webkit-appearance: none;
+}
+
+.ios-input-wrapper .ios-input {
+  padding-left: 32px;
+}
+
+.ios-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.12);
+}
+
+.ios-input::placeholder {
+  color: var(--muted);
+}
+
+.ios-textarea {
+  resize: vertical;
+  min-height: 56px;
+  line-height: 1.4;
+}
+
+.ios-hint {
+  font-size: 12px;
+  color: var(--ink-tertiary);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* ========================================
+   BUTTONS
+   ======================================== */
+.ios-btn-primary {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: var(--radius-btn);
+  background: var(--primary);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ios-btn-primary:active {
+  transform: scale(0.98);
+  background: var(--primary-dark);
+}
+
+.ios-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border: none;
+  border-radius: var(--radius-btn);
+  background: var(--primary-bg);
+  color: var(--primary);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ios-btn-secondary:active {
+  background: rgba(0, 122, 255, 0.16);
+}
+
+.ios-btn-text {
+  display: inline-block;
+  padding: 8px 0;
+  border: none;
+  background: none;
+  color: var(--primary);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ios-btn-text--small {
+  font-size: 13px;
+  padding: 4px 0;
+}
+
+.ios-btn-icon {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ========================================
+   iOS ROWS (settings-style)
+   ======================================== */
+.ios-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 0.5px solid var(--separator);
+}
+
+.ios-row:last-of-type {
+  border-bottom: none;
+}
+
+.ios-row-label {
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.ios-row-value {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: right;
+}
+
+.ios-row-value--accent {
+  color: var(--green);
+}
+
+/* ========================================
+   SEPARATOR
+   ======================================== */
+.ios-separator {
+  height: 0.5px;
+  background: var(--separator);
+  margin: 16px 0;
+}
+
+/* ========================================
+   DONUT CHART
+   ======================================== */
+.ios-donut-section {
+  padding: 16px 0;
+}
+
+.ios-donut-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.donut {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: conic-gradient(var(--primary) 60%, var(--muted) 0);
+  flex-shrink: 0;
+}
+
+.donut-inner {
+  position: absolute;
+  inset: 20px;
+  border-radius: 50%;
+  background: var(--card);
+}
+
+.donut-center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+.donut-value {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--ink);
+  position: relative;
+  z-index: 1;
+}
+
+.donut-legend {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.donut-legend li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.donut-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.donut-legend-label {
+  font-size: 14px;
+  color: var(--ink-secondary);
+}
+
+.donut-legend-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+/* ========================================
+   TRANSFERS
+   ======================================== */
+.ios-transfers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.ios-transfer-box {
+  border-radius: 12px;
+  padding: 14px;
   text-align: center;
 }
 
-/* Brand dot */
+.ios-transfer-box--primary {
+  background: var(--primary-bg);
+}
+
+.ios-transfer-box--green {
+  background: var(--green-bg);
+}
+
+.ios-transfer-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-tertiary);
+  margin-bottom: 6px;
+}
+
+.ios-transfer-amount {
+  display: block;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.ios-transfer-box--primary .ios-transfer-amount {
+  color: var(--primary);
+}
+
+.ios-transfer-box--green .ios-transfer-amount {
+  color: var(--green);
+}
+
+/* ========================================
+   CHIPS
+   ======================================== */
+.ios-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ios-chip,
+.chip-button {
+  padding: 8px 18px;
+  border-radius: 20px;
+  border: 1px solid var(--separator);
+  background: var(--card);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ios-chip--active,
+.ios-chip.active,
+.chip-button-active {
+  background: var(--primary-bg);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* ========================================
+   RADIO BUTTONS
+   ======================================== */
+.ios-radio-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.ios-radio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 12px;
+  border: 1px solid var(--separator);
+  border-radius: var(--radius-input);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.ios-radio:has(input:checked) {
+  border-color: var(--primary);
+  background: var(--primary-bg);
+}
+
+.ios-radio input[type="radio"] {
+  accent-color: var(--primary);
+}
+
+.ios-radio-label {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* ========================================
+   PREVIEW / INFO BOX
+   ======================================== */
+.ios-preview {
+  padding: 12px;
+  border-radius: var(--radius-input);
+  background: rgba(118, 118, 128, 0.06);
+  font-size: 14px;
+  color: var(--ink-tertiary);
+  line-height: 1.5;
+}
+
+/* ========================================
+   RESULT CARD
+   ======================================== */
+.ios-result-card {
+  text-align: center;
+  padding: 24px 16px;
+}
+
+.ios-result-label {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-tertiary);
+  margin-bottom: 4px;
+}
+
+.ios-result-amount {
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -1px;
+  line-height: 1.1;
+}
+
+.ios-result-context {
+  font-size: 14px;
+  color: var(--ink-tertiary);
+  margin-top: 4px;
+  margin-bottom: 16px;
+}
+
+/* ========================================
+   SHARE
+   ======================================== */
+.ios-share-status {
+  font-size: 14px;
+  color: var(--ink-tertiary);
+  margin-bottom: 16px;
+}
+
+.ios-share-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ios-share-link {
+  margin-top: 16px;
+}
+
+.ios-share-link-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.ios-share-link-row .ios-input {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  background: rgba(118, 118, 128, 0.06);
+}
+
+/* ========================================
+   QUICK SPLIT
+   ======================================== */
+.ios-quick-split {
+  padding: 12px;
+  background: rgba(118, 118, 128, 0.06);
+  border-radius: var(--radius-input);
+}
+
+/* ========================================
+   EMPTY & ERROR STATES
+   ======================================== */
+.ios-empty-state {
+  text-align: center;
+  color: var(--ink-tertiary);
+  font-size: 14px;
+  padding: 24px 16px;
+}
+
+.ios-error {
+  font-size: 14px;
+  color: var(--red);
+}
+
+.ios-warning {
+  font-size: 13px;
+  color: var(--orange);
+  margin-top: 4px;
+}
+
+.ios-debt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ios-footer-info {
+  text-align: center;
+  padding: 24px 0;
+  font-size: 12px;
+  color: var(--ink-tertiary);
+}
+
+/* ========================================
+   TABS SYSTEM
+   ======================================== */
+.tab-section {
+  animation: fadeIn 0.25s ease;
+}
+
+.tab-section.hidden {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ========================================
+   LEGACY SUPPORT (for JS classes)
+   ======================================== */
+.tab-button-active {
+  /* Used by app-hybrid.js */
+}
+
+.badge-success {
+  color: var(--green);
+  font-weight: 700;
+}
+
+.result-box {
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+}
+
 .brand-dot {
-  width: .7rem;
-  height: .7rem;
-  border-radius: 999px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
   display: inline-block;
 }
 
-/* Badge success */
-.badge-success {
-  background: rgba(16, 185, 129, .15);
-  /* Emerald con opacidad */
-  color: #059669;
-  /* Emerald oscuro */
-  padding: .15rem .5rem;
-  border-radius: .5rem;
-}
-
-/* Donut chart */
-.donut {
-  background: conic-gradient(var(--primary) 60%, var(--muted) 0);
-}
-
-/* Tab buttons */
-.tab-button {
-  transition: all .2s ease;
-}
-
-.tab-button-active {
-  background: var(--primary);
-  color: #FFFFFF;
-  /* Texto blanco sobre índigo */
-  box-shadow: 0 10px 24px rgba(99, 102, 241, .25);
-  /* Shadow índigo */
-}
-
-/* Chip buttons */
-.chip-button {
-  border-radius: 999px;
-  border: 1px solid var(--muted);
-  padding: .25rem .875rem;
-  font-size: .85rem;
-  font-weight: 600;
-  color: var(--ink);
-  /* Usar ink en lugar de gris hardcoded */
-  transition: all .2s ease;
-}
-
-.chip-button-active {
-  background: rgba(99, 102, 241, .1);
-  /* Índigo con opacidad */
-  border-color: var(--primary);
-  color: var(--primary);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, .15);
-}
-
-/* Loading spinner */
-.spinner {
-  border: 2px solid var(--muted);
-  border-top-color: var(--primary);
-  border-radius: 50%;
-  width: 1rem;
-  height: 1rem;
-  animation: spin 0.6s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* Sync status indicator */
+/* ========================================
+   SYNC INDICATOR
+   ======================================== */
 .sync-indicator {
+  position: fixed;
+  top: calc(var(--safe-top) + 8px);
+  right: 16px;
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.25rem 0.75rem;
-  border-radius: 999px;
-  font-size: 0.75rem;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
   font-weight: 600;
-  transition: all 0.2s ease;
+  z-index: 60;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .sync-indicator.synced {
-  background: rgba(16, 185, 129, .12);
-  /* Emerald */
+  background: rgba(52, 199, 89, 0.15);
   color: #059669;
 }
 
 .sync-indicator.saving,
 .sync-indicator.loading {
-  background: rgba(99, 102, 241, .12);
-  /* Índigo */
-  color: #4F46E5;
+  background: rgba(0, 122, 255, 0.12);
+  color: var(--primary);
 }
 
 .sync-indicator.error {
-  background: rgba(239, 68, 68, .12);
-  color: #991b1b;
+  background: rgba(255, 59, 48, 0.12);
+  color: var(--red);
 }
 
 .sync-indicator.idle {
-  background: rgba(107, 114, 128, .12);
-  color: #374151;
+  background: rgba(142, 142, 147, 0.12);
+  color: var(--ink-tertiary);
 }
 
-/* Pulse animation for loading/saving states */
-.sync-indicator.saving .spinner,
-.sync-indicator.loading .spinner {
+.spinner {
+  border: 2px solid var(--muted);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
   animation: spin 0.6s linear infinite;
 }
 
-/* Offline indicator */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   OFFLINE BANNER
+   ======================================== */
 .offline-banner {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  background: var(--accent);
-  /* Amber */
-  color: #92400E;
-  /* Amber oscuro */
-  padding: 0.5rem;
+  background: var(--orange);
+  color: #fff;
+  padding: calc(var(--safe-top) + 4px) 16px 8px;
   text-align: center;
-  font-size: 0.875rem;
+  font-size: 13px;
   font-weight: 600;
   z-index: 100;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transform: translateY(-100%);
   transition: transform 0.3s ease;
 }
@@ -197,34 +856,105 @@ body {
   transform: translateY(0);
 }
 
-/* Focus states mejor */
-input:focus,
-textarea:focus,
-button:focus {
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-  /* Índigo focus ring */
+/* ========================================
+   TOAST (iOS Style)
+   ======================================== */
+#toast-container {
+  position: fixed;
+  top: calc(var(--safe-top) + 12px);
+  right: 16px;
+  left: 16px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
 }
 
-/* Skeleton loading */
-.skeleton {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200% 100%;
-  animation: skeleton-loading 1.5s ease-in-out infinite;
-  border-radius: 0.5rem;
+.ios-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: var(--card);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.08);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  transform: translateY(-20px);
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  pointer-events: auto;
 }
 
-@keyframes skeleton-loading {
-  0% {
-    background-position: 200% 0;
+.ios-toast-visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.ios-toast-icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+}
+
+.ios-toast-message {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.ios-toast-close {
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  padding: 2px;
+  cursor: pointer;
+  color: var(--ink-tertiary);
+  transition: color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ios-toast-close:active {
+  color: var(--ink);
+}
+
+.ios-toast-info .ios-toast-icon { color: var(--primary); }
+.ios-toast-success .ios-toast-icon { color: var(--green); }
+.ios-toast-warning .ios-toast-icon { color: var(--orange); }
+.ios-toast-error .ios-toast-icon { color: var(--red); }
+
+@media (min-width: 768px) {
+  #toast-container {
+    left: auto;
+    max-width: 380px;
   }
-
-  100% {
-    background-position: -200% 0;
-  }
 }
 
-/* Mejoras de accesibilidad */
+/* ========================================
+   SCROLLBAR (desktop)
+   ======================================== */
+.app-main::-webkit-scrollbar {
+  width: 6px;
+}
+
+.app-main::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.app-main::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+.app-main::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -237,34 +967,218 @@ button:focus {
   border-width: 0;
 }
 
-/* Animaciones suaves */
-@media (prefers-reduced-motion: reduce) {
+.hidden {
+  display: none !important;
+}
 
-  *,
-  *::before,
-  *::after {
+/* Focus ring */
+*:focus-visible {
+  outline: 3px solid rgba(0, 122, 255, 0.4);
+  outline-offset: 2px;
+}
+
+input:focus {
+  outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
     animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }
 
-/* Modo oscuro preparado (para futuro) */
-@media (prefers-color-scheme: dark) {
-  /* Aquí podrían ir estilos dark mode si lo implementas */
-}
-
-/* Print styles */
-@media print {
-
-  .tab-button,
-  button,
-  .sync-indicator {
-    display: none;
+/* ========================================
+   DESKTOP RESPONSIVE (768px+)
+   ======================================== */
+@media (min-width: 768px) {
+  :root {
+    --tab-bar-height: 0px;
   }
 
-  .card {
+  body {
+    overflow: auto;
+  }
+
+  .app-wrapper {
+    max-height: none;
+    overflow: visible;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .app-header {
+    padding: 20px 24px 12px;
+  }
+
+  .app-header-content {
+    max-width: 800px;
+  }
+
+  .app-header-logo {
+    width: 36px;
+    height: 36px;
+  }
+
+  .app-header-title {
+    font-size: 24px;
+  }
+
+  .app-main {
+    overflow: visible;
+    padding: 0 24px 40px;
+    padding-bottom: 40px;
+  }
+
+  .app-main > section {
+    max-width: 800px;
+  }
+
+  /* Desktop tab bar → horizontal top nav */
+  .tab-bar {
+    position: static;
+    order: -1;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-top: none;
+    border-bottom: 0.5px solid var(--separator);
+    justify-content: center;
+    gap: 4px;
+    padding: 0 24px 0;
+    max-width: 800px;
+    margin: 0 auto 20px;
+  }
+
+  .app-header {
+    order: -2;
+  }
+
+  .tab-bar-item {
+    flex-direction: row;
+    gap: 6px;
+    padding: 12px 20px;
+    border-radius: 10px 10px 0 0;
+    flex: none;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .tab-bar-item.active {
+    border-bottom-color: var(--primary);
+    background: rgba(0, 122, 255, 0.04);
+  }
+
+  .tab-bar-item:hover:not(.active) {
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  .tab-bar-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .tab-bar-label {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  /* Desktop cards with more padding */
+  .ios-card {
+    padding: 20px;
+    margin-bottom: 16px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-elevated);
+  }
+
+  .ios-card-title {
+    font-size: 22px;
+  }
+
+  /* Desktop transfers side by side */
+  .ios-transfers {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .ios-transfer-amount {
+    font-size: 26px;
+  }
+
+  /* Desktop result card */
+  .ios-result-amount {
+    font-size: 48px;
+  }
+
+  /* Desktop share actions horizontal */
+  .ios-share-actions {
+    flex-direction: row;
+  }
+
+  .ios-share-actions .ios-btn-primary {
+    width: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* Large desktop */
+@media (min-width: 1024px) {
+  .app-main > section[data-tab-section="calc"] {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 16px;
+    align-items: start;
+  }
+
+  .app-main > section[data-tab-section="calc"] .ios-card:first-child {
+    grid-column: 1;
+    position: sticky;
+    top: 16px;
+  }
+
+  .app-main > section[data-tab-section="calc"] .ios-card:nth-child(2) {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .app-main > section[data-tab-section="calc"] .ios-card:nth-child(3) {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .app-main > section[data-tab-section="reimburse"] {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+
+  .app-main > section[data-tab-section="reimburse"] #debt-form-card {
+    position: sticky;
+    top: 16px;
+  }
+}
+
+/* ========================================
+   PRINT
+   ======================================== */
+@media print {
+  .tab-bar,
+  .app-header,
+  .sync-indicator,
+  button {
+    display: none !important;
+  }
+
+  .app-main {
+    overflow: visible;
+    padding: 0;
+  }
+
+  .ios-card {
     box-shadow: none;
     border: 1px solid #ccc;
+    break-inside: avoid;
   }
 }

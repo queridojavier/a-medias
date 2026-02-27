@@ -2,7 +2,7 @@
 
 import { SPLIT_MODES, DEFAULTS, STORAGE_KEYS, TIMINGS } from './constants.js';
 import { formatMoney, formatPercent, round2, readNumber, getElement, storage, calculateProportion, debounce } from './utils.js';
-import syncManager from './sync.js';
+
 
 class Calculator {
   constructor() {
@@ -101,8 +101,8 @@ class Calculator {
     if (!modeProp || !modeEq) return;
 
     if (this.mode === SPLIT_MODES.PROPORTIONAL) {
-      modeProp.className = 'flex-1 px-3 py-1.5 rounded-lg text-sm font-medium text-center bg-white shadow text-slate-900 ring-1 ring-[var(--primary)]';
-      modeEq.className = 'flex-1 px-3 py-1.5 rounded-lg text-sm font-medium text-center text-slate-700 hover:text-slate-900';
+      modeProp.className = 'ios-segment-btn active';
+      modeEq.className = 'ios-segment-btn';
       modeProp.setAttribute('aria-pressed', 'true');
       modeEq.setAttribute('aria-pressed', 'false');
 
@@ -110,8 +110,8 @@ class Calculator {
         modeHint.textContent = 'Reparte según el peso de cada nómina.';
       }
     } else {
-      modeEq.className = 'flex-1 px-3 py-1.5 rounded-lg text-sm font-medium text-center bg-white shadow text-slate-900 ring-1 ring-[var(--primary)]';
-      modeProp.className = 'flex-1 px-3 py-1.5 rounded-lg text-sm font-medium text-center text-slate-700 hover:text-slate-900';
+      modeEq.className = 'ios-segment-btn active';
+      modeProp.className = 'ios-segment-btn';
       modeEq.setAttribute('aria-pressed', 'true');
       modeProp.setAttribute('aria-pressed', 'false');
 

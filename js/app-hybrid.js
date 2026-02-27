@@ -115,9 +115,10 @@ class App {
 
     document.querySelectorAll('[data-tab-target]').forEach((btn) => {
       const isActive = btn.dataset.tabTarget === tabId;
-      btn.classList.toggle('tab-button-active', isActive);
-      btn.classList.toggle('text-slate-900', isActive);
-      btn.classList.toggle('text-slate-600', !isActive);
+      btn.classList.toggle('active', isActive);
+      if (btn.getAttribute('role') === 'tab') {
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      }
     });
 
     this.handleLocalStateChange();
@@ -272,10 +273,11 @@ class App {
     // Actualizar texto de status
     if (!isSharing) {
       shareStatus.textContent = 'Guardado localmente en este dispositivo.';
-      shareStatus.className = 'text-sm text-slate-600';
+      shareStatus.className = 'ios-share-status';
     } else {
       shareStatus.textContent = `Compartiendo vía ${syncInfo.backend}`;
-      shareStatus.className = 'text-sm text-green-600 font-medium';
+      shareStatus.className = 'ios-share-status';
+      shareStatus.style.color = 'var(--green)';
     }
 
     // Actualizar input del enlace

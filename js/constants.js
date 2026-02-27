@@ -1,14 +1,12 @@
 // constants.js - Configuración y constantes de la aplicación
 
-export const APP_VERSION = '2.0.0';
+export const APP_VERSION = '3.1.0';
 
 // Timings (en milisegundos)
 export const TIMINGS = {
-  SYNC_POLL_INTERVAL: 8000,        // Polling para sincronización remota
   SYNC_DEBOUNCE: 300,              // Debounce para guardar cambios
   CALC_DEBOUNCE: 80,               // Debounce para recalcular
   TOAST_DURATION: 4000,            // Duración de notificaciones
-  RETRY_DELAY: 5000,               // Delay para reintentar tras error
 };
 
 // Storage keys
@@ -47,10 +45,11 @@ export const TABS = {
   CALC: 'calc',
   REIMBURSE: 'reimburse',
   SPLIT: 'split',
+  SHARE: 'share',
 };
 
 // Estado de data version para migraciones
-export const DATA_VERSION = 2;
+export const DATA_VERSION = 3;
 
 // Valores por defecto
 export const DEFAULTS = {
@@ -62,15 +61,4 @@ export const DEFAULTS = {
   installments: 5,
   splitCount: 2,
   splitTotal: 60,
-};
-
-// Configuración de Supabase (se carga desde config.js)
-export const getSupabaseConfig = () => {
-  const config = window.__A_MEDIAS_CONFIG__ || {};
-  return {
-    url: config.supabaseUrl || '',
-    anonKey: config.supabaseAnonKey || '',
-    table: config.supabaseTable || 'a_medias_shares',
-    enabled: Boolean(config.supabaseUrl && config.supabaseAnonKey),
-  };
 };

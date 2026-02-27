@@ -1,7 +1,7 @@
-// sync-hybrid.js - Sistema híbrido que soporta Local First + Supabase opcional
-// Prioriza Local First, pero mantiene compatibilidad con Supabase
+// sync-hybrid.js - Sistema Local First para compartir datos vía URL
+// Los datos se almacenan localmente en IndexedDB y se comparten mediante URLs cifradas
 
-import { SYNC_STATUS, TIMINGS, getSupabaseConfig } from './constants.js';
+import { SYNC_STATUS, TIMINGS } from './constants.js';
 import { logger, isOnline } from './utils.js';
 import toast from './toast.js';
 import localStorage from './storage-local.js';
@@ -14,7 +14,6 @@ const SHARE_MODE_KEY = 'a_medias_share_mode';
 const SHARE_MODES = {
   NONE: 'none',           // Solo local
   URL: 'url',             // Compartir vía URL
-  SUPABASE: 'supabase'    // Compartir vía Supabase (legacy)
 };
 
 class HybridSyncManager {
@@ -24,18 +23,13 @@ class HybridSyncManager {
     this.onStateChange = null;
     this.onStatusChange = null;
     this.autoSaveTimer = null;
-
-    // Para Supabase (compatibilidad legacy)
-    this.shareId = null;
-    this.shareKey = null;
-    this.supabaseConfig = getSupabaseConfig();
   }
 
   /**
    * Inicializa el sistema desde localStorage o URL
    */
   async init() {
-    logger.log('[HybridSync] Inicializando sistema híbrido');
+    logger.log('[HybridSync] Inicializando sistema Local First');
 
     // Restaurar modo de compartir
     this.shareMode = await localStorage.load(SHARE_MODE_KEY, SHARE_MODES.NONE);
@@ -43,14 +37,6 @@ class HybridSyncManager {
     // Verificar si hay datos compartidos en URL
     if (urlShareManager.hasSharedData()) {
       return await this.loadFromURL();
-    }
-
-    // Verificar si hay parámetros de Supabase en URL (legacy)
-    const params = new URLSearchParams(window.location.search);
-    if (params.has('share') && params.has('key')) {
-      logger.log('[HybridSync] Detectada URL de Supabase (legacy)');
-      toast.info('Migrando enlace antiguo al nuevo sistema...');
-      // TODO: Migrar de Supabase a Local First
     }
 
     // Cargar estado local
@@ -260,17 +246,8 @@ class HybridSyncManager {
       status: this.status,
       isSharing: this.shareMode !== SHARE_MODES.NONE,
       shareUrl: this.getShareURL(),
-      backend: this.shareMode === SHARE_MODES.URL ? 'URL (Local First)' :
-               this.shareMode === SHARE_MODES.SUPABASE ? 'Supabase (Legacy)' :
-               'Local Only'
+      backend: this.shareMode === SHARE_MODES.URL ? 'URL (Cifrado)' : 'Local'
     };
-  }
-
-  /**
-   * Verifica si Supabase está configurado
-   */
-  get hasSupabaseConfig() {
-    return this.supabaseConfig.enabled;
   }
 
   /**

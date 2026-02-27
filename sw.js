@@ -1,4 +1,4 @@
-const CACHE = 'a-medias-v2.3';
+const CACHE = 'a-medias-v4.0';
 const ASSETS = [
   './',
   './index.html',
@@ -9,15 +9,17 @@ const ASSETS = [
   './js/constants.js',
   './js/utils.js',
   './js/toast.js',
-  './js/sync.js',
+  './js/storage-local.js',
+  './js/share-url.js',
+  './js/sync-hybrid.js',
   './js/calculator.js',
   './js/reimbursements.js',
   './js/split.js',
-  './js/app.js'
+  './js/app-hybrid.js'
 ];
 
 // CDNs permitidos para cache runtime
-const ALLOWED_CDN = ['cdn.tailwindcss.com', 'fonts.googleapis.com', 'fonts.gstatic.com'];
+const ALLOWED_CDN = ['fonts.googleapis.com', 'fonts.gstatic.com'];
 
 self.addEventListener('install', event => {
   self.skipWaiting();
