@@ -125,7 +125,6 @@
               <p class="section-kicker">Gastos comunes</p>
               <h2 class="section-title">Tabla editable de gastos fijos</h2>
             </div>
-            <button id="common-expenses-add" type="button" class="ios-btn-secondary">Añadir fila</button>
           </div>
 
           <div class="stats-grid stats-grid--expenses">
@@ -149,9 +148,11 @@
                 <thead>
                   <tr>
                     <th>Concepto</th>
+                    <th>Importe</th>
+                    <th>Frecuencia</th>
                     <th>Mensual</th>
                     <th>Anual</th>
-                    <th>Vencimiento</th>
+                    <th>Día cobro</th>
                     <th>Categoría</th>
                     <th>Notas</th>
                     <th></th>
@@ -163,6 +164,7 @@
             <div id="common-expenses-empty" class="empty-table hidden">
               No hay gastos comunes todavía.
             </div>
+            <button id="common-expenses-add" type="button" class="expenses-add-btn">+ Añadir gasto</button>
           </article>
         </section>
 

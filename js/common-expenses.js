@@ -8,12 +8,23 @@ const DEFAULT_EXPENSES = () => [
   {
     id: generateUUID(),
     concept: 'Hipoteca + gastos comunes',
-    monthly: 700,
-    dueDate: '',
+    amount: 700,
+    frequency: 'monthly',
+    dueDay: 1,
     category: 'Vivienda',
     notes: 'Cuenta común',
   },
 ];
+
+function getMonthlyAmount(expense) {
+  const amount = Number(expense.amount) || 0;
+  return expense.frequency === 'annual' ? round2(amount / 12) : round2(amount);
+}
+
+function getAnnualAmount(expense) {
+  const amount = Number(expense.amount) || 0;
+  return expense.frequency === 'annual' ? round2(amount) : round2(amount * 12);
+}
 
 class CommonExpensesManager {
   constructor() {
@@ -57,12 +68,48 @@ class CommonExpensesManager {
     return {
       id: generateUUID(),
       concept: '',
-      monthly: 0,
-      dueDate: '',
+      amount: 0,
+      frequency: 'monthly',
+      dueDay: 0,
       category: 'Otros',
       notes: '',
       ...overrides,
     };
+  }
+
+  /**
+   * Migra datos del formato antiguo (monthly, dueDate) al nuevo (amount, frequency, dueDay)
+   */
+  migrateExpense(item) {
+    const migrated = { ...item };
+
+    // Migrar monthly → amount (si no tiene amount)
+    if (migrated.monthly !== undefined && migrated.amount === undefined) {
+      migrated.amount = Number(migrated.monthly) || 0;
+      delete migrated.monthly;
+    }
+
+    // Asegurar frequency
+    if (!migrated.frequency) {
+      migrated.frequency = 'monthly';
+    }
+
+    // Migrar dueDate → dueDay
+    if (migrated.dueDate !== undefined && migrated.dueDay === undefined) {
+      if (migrated.dueDate) {
+        try {
+          const day = new Date(migrated.dueDate).getDate();
+          migrated.dueDay = (day >= 1 && day <= 31) ? day : 0;
+        } catch {
+          migrated.dueDay = 0;
+        }
+      } else {
+        migrated.dueDay = 0;
+      }
+      delete migrated.dueDate;
+    }
+
+    return migrated;
   }
 
   normalizeExpenses(source) {
@@ -76,14 +123,18 @@ class CommonExpensesManager {
       }));
     }
 
-    return source.map((item) => this.createExpense({
-      id: item?.id || generateUUID(),
-      concept: String(item?.concept || ''),
-      monthly: round2(Number(item?.monthly) || 0),
-      dueDate: item?.dueDate || '',
-      category: categories.includes(item?.category) ? item.category : fallbackCategory,
-      notes: String(item?.notes || ''),
-    }));
+    return source.map((item) => {
+      const migrated = this.migrateExpense(item);
+      return this.createExpense({
+        id: migrated?.id || generateUUID(),
+        concept: String(migrated?.concept || ''),
+        amount: round2(Number(migrated?.amount) || 0),
+        frequency: migrated?.frequency === 'annual' ? 'annual' : 'monthly',
+        dueDay: Math.max(0, Math.min(31, parseInt(migrated?.dueDay) || 0)),
+        category: categories.includes(migrated?.category) ? migrated.category : fallbackCategory,
+        notes: String(migrated?.notes || ''),
+      });
+    });
   }
 
   loadExpenses() {
@@ -102,6 +153,14 @@ class CommonExpensesManager {
     this.expenses.push(this.createExpense());
     this.saveExpenses();
     this.render();
+
+    // Scroll al final de la tabla para que la nueva fila sea visible
+    if (this.elements.tableBody) {
+      const lastRow = this.elements.tableBody.lastElementChild;
+      if (lastRow) {
+        lastRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
   }
 
   removeExpense(expenseId) {
@@ -119,10 +178,12 @@ class CommonExpensesManager {
     const expense = this.expenses.find((item) => item.id === expenseId);
     if (!expense) return null;
 
-    if (field === 'monthly') {
-      expense.monthly = round2(Math.max(0, parseFloat(String(rawValue || '').replace(',', '.')) || 0));
-    } else if (field === 'dueDate') {
-      expense.dueDate = String(rawValue || '');
+    if (field === 'amount') {
+      expense.amount = round2(Math.max(0, parseFloat(String(rawValue || '').replace(',', '.')) || 0));
+    } else if (field === 'frequency') {
+      expense.frequency = rawValue === 'annual' ? 'annual' : 'monthly';
+    } else if (field === 'dueDay') {
+      expense.dueDay = Math.max(0, Math.min(31, parseInt(rawValue) || 0));
     } else if (field === 'category') {
       const categories = this.getCategories();
       expense.category = categories.includes(rawValue) ? rawValue : (categories[0] || 'Otros');
@@ -144,12 +205,13 @@ class CommonExpensesManager {
     const updatedExpense = this.updateExpense(expenseId, field, target.value);
     if (!updatedExpense) return;
 
-    if (field === 'monthly') {
+    // Actualizar columnas calculadas de esa fila
+    if (field === 'amount' || field === 'frequency') {
       const row = target.closest('tr');
-      const annualCell = row?.querySelector('.table-annual');
-      if (annualCell) {
-        annualCell.textContent = formatMoney(round2(updatedExpense.monthly * 12));
-      }
+      const monthlyCell = row?.querySelector('.col-monthly');
+      const annualCell = row?.querySelector('.col-annual');
+      if (monthlyCell) monthlyCell.textContent = formatMoney(getMonthlyAmount(updatedExpense));
+      if (annualCell) annualCell.textContent = formatMoney(getAnnualAmount(updatedExpense));
     }
   }
 
@@ -157,19 +219,6 @@ class CommonExpensesManager {
     const button = event.target.closest('[data-remove-expense]');
     if (!button) return;
     this.removeExpense(button.dataset.removeExpense);
-  }
-
-  formatDate(dateValue) {
-    if (!dateValue) return 'Sin fecha';
-    try {
-      return new Intl.DateTimeFormat('es-ES', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-      }).format(new Date(dateValue));
-    } catch {
-      return dateValue;
-    }
   }
 
   render() {
@@ -192,7 +241,7 @@ class CommonExpensesManager {
             type="text"
             class="table-input"
             value="${escapeHtml(expense.concept)}"
-            placeholder="Hipoteca, luz, internet..."
+            placeholder="Hipoteca, luz..."
             data-expense-id="${escapeHtml(expense.id)}"
             data-field="concept"
           >
@@ -205,20 +254,34 @@ class CommonExpensesManager {
               step="0.01"
               min="0"
               class="table-input table-input--money"
-              value="${expense.monthly}"
+              value="${expense.amount}"
               data-expense-id="${escapeHtml(expense.id)}"
-              data-field="monthly"
+              data-field="amount"
             >
           </div>
         </td>
-        <td class="table-annual">${formatMoney(round2(expense.monthly * 12))}</td>
+        <td>
+          <select
+            class="table-input table-select"
+            data-expense-id="${escapeHtml(expense.id)}"
+            data-field="frequency"
+          >
+            <option value="monthly" ${expense.frequency === 'monthly' ? 'selected' : ''}>Mes</option>
+            <option value="annual" ${expense.frequency === 'annual' ? 'selected' : ''}>Año</option>
+          </select>
+        </td>
+        <td class="col-monthly">${formatMoney(getMonthlyAmount(expense))}</td>
+        <td class="col-annual">${formatMoney(getAnnualAmount(expense))}</td>
         <td>
           <input
-            type="date"
-            class="table-input"
-            value="${escapeHtml(expense.dueDate)}"
+            type="number"
+            min="1"
+            max="31"
+            class="table-input table-input--day"
+            value="${expense.dueDay || ''}"
+            placeholder="—"
             data-expense-id="${escapeHtml(expense.id)}"
-            data-field="dueDate"
+            data-field="dueDay"
           >
         </td>
         <td>
@@ -237,7 +300,7 @@ class CommonExpensesManager {
             type="text"
             class="table-input"
             value="${escapeHtml(expense.notes)}"
-            placeholder="Cuenta común, renovación..."
+            placeholder="Nota..."
             data-expense-id="${escapeHtml(expense.id)}"
             data-field="notes"
           >
@@ -265,7 +328,7 @@ class CommonExpensesManager {
     }
 
     if (this.elements.updatedAt) {
-      this.elements.updatedAt.textContent = `Actualizado: ${this.formatDate(todayISO())}`;
+      this.elements.updatedAt.textContent = `Actualizado: ${new Intl.DateTimeFormat('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date())}`;
     }
   }
 
@@ -283,14 +346,14 @@ class CommonExpensesManager {
   }
 
   getSummary() {
-    const totalMonthly = round2(this.expenses.reduce((acc, expense) => acc + (Number(expense.monthly) || 0), 0));
+    const totalMonthly = round2(this.expenses.reduce((acc, expense) => acc + getMonthlyAmount(expense), 0));
     return {
       totalMonthly,
       totalAnnual: round2(totalMonthly * 12),
       count: this.expenses.length,
       categories: this.expenses.reduce((acc, expense) => {
         const current = acc[expense.category] || 0;
-        acc[expense.category] = round2(current + expense.monthly);
+        acc[expense.category] = round2(current + getMonthlyAmount(expense));
         return acc;
       }, {}),
     };

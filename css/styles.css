@@ -500,6 +500,37 @@ button {
   color: var(--text-muted);
 }
 
+.expenses-add-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-top: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 14px;
+  transition: background 140ms ease, color 140ms ease;
+}
+
+.expenses-add-btn:active {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+}
+
+.table-input--day {
+  width: 64px;
+  text-align: center;
+}
+
+.col-monthly,
+.col-annual {
+  white-space: nowrap;
+  color: var(--text-soft);
+  font-weight: 600;
+}
+
 .panel-card {
   padding: 20px;
 }
@@ -1666,6 +1697,14 @@ textarea::placeholder {
   .table-input {
     border-radius: 10px;
     padding: 10px;
+  }
+
+  .expenses-add-btn {
+    border-radius: 0 0 16px 16px;
+  }
+
+  .table-input--day {
+    width: 56px;
   }
 
   /* ── Transfers ── */
