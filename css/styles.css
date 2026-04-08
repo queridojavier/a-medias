@@ -1452,7 +1452,19 @@ textarea::placeholder {
 }
 
 @media (max-width: 719px) {
-  /* ── Eliminar efecto "marco" en móvil ── */
+  /* ═══════════════════════════════════════════
+     MOBILE: App nativa fullscreen
+     ═══════════════════════════════════════════ */
+
+  /* ── Base: fondo plano, sin decoración ── */
+  html {
+    background: var(--bg);
+  }
+
+  body {
+    background: var(--bg);
+  }
+
   .app-shell {
     padding: 0;
     background: var(--bg);
@@ -1475,45 +1487,137 @@ textarea::placeholder {
     display: none;
   }
 
-  /* ── Header nativo ── */
+  /* ── Header compacto nativo ── */
   .app-header {
-    padding: calc(var(--safe-top) + 16px) 18px 14px;
+    padding: calc(var(--safe-top) + 12px) 20px 12px;
     flex-direction: column;
+    gap: 4px;
+  }
+
+  .app-kicker {
+    font-size: 10px;
+  }
+
+  .app-title {
+    font-size: 26px;
+    margin-top: 4px;
+  }
+
+  .app-header-note {
+    text-align: left;
+    max-width: none;
+    font-size: 12px;
+    margin-top: 2px;
   }
 
   /* ── Contenido principal ── */
   .app-main {
-    padding: 0 16px 110px;
+    padding: 0 16px 96px;
+    -webkit-overflow-scrolling: touch;
   }
 
-  /* ── Tab bar edge-to-edge ── */
-  .tab-bar {
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 0;
-    border-left: none;
-    border-right: none;
-    border-bottom: none;
-    padding: 8px 12px calc(var(--safe-bottom) + 8px);
-    gap: 0;
+  /* ── Tarjetas: estilo iOS grouped, sin bordes visibles ── */
+  .hero-panel,
+  .panel-card,
+  .metric-card,
+  .summary-card,
+  .table-card {
+    border: none;
+    border-radius: 16px;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--surface-strong);
   }
 
-  .tab-bar-item {
-    padding: 10px 6px 9px;
-    border-radius: 14px;
+  /* ── Hero panel: integrado, compacto ── */
+  .hero-panel {
+    padding: 18px;
+    margin-bottom: 12px;
+    gap: 14px;
   }
 
-  .tab-bar-label {
-    font-size: 11px;
+  .hero-panel h2 {
+    font-size: 22px;
+    margin: 4px 0 6px;
   }
 
-  /* ── Grids single-column ── */
-  .stats-grid,
-  .settle-layout,
-  .calc-layout,
+  .hero-copy p:last-child {
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .hero-distribution {
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .distribution-legend strong {
+    font-size: 20px;
+  }
+
+  /* ── Metrics grid compacto ── */
+  .stats-grid {
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .metric-card {
+    padding: 14px;
+    min-height: auto;
+  }
+
+  .metric-value {
+    font-size: 22px;
+    margin: 6px 0 4px;
+  }
+
+  .metric-note {
+    font-size: 12px;
+  }
+
+  /* ── Summary/Calc/Settle/Settings layouts ── */
   .summary-layout,
-  .settings-layout,
+  .calc-layout,
+  .settle-layout,
+  .settings-layout {
+    gap: 12px;
+  }
+
+  .summary-card {
+    padding: 18px;
+  }
+
+  .summary-card h3 {
+    font-size: 28px;
+  }
+
+  /* ── Panel cards ── */
+  .panel-card {
+    padding: 18px;
+  }
+
+  .panel-card-header h3 {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+
+  .panel-card-header {
+    margin-bottom: 12px;
+  }
+
+  /* ── Section intros ── */
+  .section-intro {
+    flex-direction: column;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-size: 22px;
+  }
+
+  /* ── Forms más compactos ── */
   .ios-form-row,
   .ios-radio-group,
   .ios-transfers,
@@ -1523,8 +1627,82 @@ textarea::placeholder {
     grid-template-columns: 1fr;
   }
 
-  .section-intro {
-    flex-direction: column;
+  .ios-input {
+    padding: 12px 14px;
+    border-radius: 12px;
+  }
+
+  .ios-input-wrapper .ios-input {
+    padding-left: 32px;
+  }
+
+  .ios-segment {
+    border-radius: 12px;
+  }
+
+  .ios-segment-btn {
+    padding: 9px 14px;
+    border-radius: 10px;
+  }
+
+  .ios-btn-primary {
+    border-radius: 12px;
+    padding: 13px 16px;
+  }
+
+  .ios-btn-secondary {
+    border-radius: 12px;
+  }
+
+  /* ── Tabla ── */
+  .table-card {
+    border-radius: 16px;
+  }
+
+  .table-input {
+    border-radius: 10px;
+    padding: 10px;
+  }
+
+  /* ── Transfers ── */
+  .ios-transfer-box {
+    border-radius: 14px;
+    padding: 14px;
+    border: none;
+  }
+
+  .ios-transfer-amount {
+    font-size: 28px;
+  }
+
+  /* ── Donut ── */
+  .donut {
+    width: 130px;
+    height: 130px;
+  }
+
+  .donut-inner {
+    inset: 18px;
+  }
+
+  .donut-value {
+    font-size: 22px;
+  }
+
+  /* ── Reimbursements ── */
+  .reimbursement-card {
+    border-radius: 16px;
+    border: none;
+    background: var(--surface-strong);
+    padding: 16px;
+  }
+
+  .reimbursement-card-title {
+    font-size: 20px;
+  }
+
+  .reimbursement-card-total strong {
+    font-size: 24px;
   }
 
   .reimbursement-card-header,
@@ -1538,6 +1716,82 @@ textarea::placeholder {
 
   .reimbursement-card-total {
     text-align: left;
+  }
+
+  .reimbursement-mini-card {
+    border-radius: 12px;
+    border: none;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .reimbursement-history ul {
+    border-radius: 12px;
+    border: none;
+  }
+
+  /* ── Settings ── */
+  .settings-placeholder-item,
+  .profile-preview-card {
+    border-radius: 12px;
+    border: none;
+  }
+
+  /* ── Quick split ── */
+  .ios-quick-split {
+    border-radius: 14px;
+    border: none;
+  }
+
+  .split-result-card {
+    border-radius: 14px;
+    border: none;
+  }
+
+  /* ── Radio / Preview ── */
+  .ios-radio {
+    border-radius: 12px;
+  }
+
+  .ios-preview {
+    border-radius: 12px;
+  }
+
+  /* ── Tab bar: barra sólida nativa ── */
+  .tab-bar {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 0;
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 6px 8px calc(var(--safe-bottom) + 4px);
+    gap: 0;
+    background: rgba(10, 10, 12, 0.92);
+  }
+
+  .tab-bar-item {
+    padding: 8px 4px 6px;
+    border-radius: 10px;
+    gap: 4px;
+  }
+
+  .tab-bar-item.active {
+    background: transparent;
+    color: var(--gold);
+  }
+
+  .tab-bar-item.active::before {
+    display: none;
+  }
+
+  .tab-bar-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .tab-bar-label {
+    font-size: 10px;
+    font-weight: 600;
   }
 }
 

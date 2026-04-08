@@ -1,4 +1,4 @@
-const CACHE = 'a-medias-v4.1';
+const CACHE = 'a-medias-v4.2';
 const ASSETS = [
   './',
   './index.html',
@@ -15,6 +15,8 @@ const ASSETS = [
   './js/calculator.js',
   './js/reimbursements.js',
   './js/split.js',
+  './js/common-expenses.js',
+  './js/settings.js',
   './js/app-hybrid.js'
 ];
 
