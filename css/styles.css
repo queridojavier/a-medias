@@ -1470,6 +1470,10 @@ textarea::placeholder {
     background: var(--bg);
   }
 
+  .sync-indicator {
+    display: none;
+  }
+
   .app-glow {
     display: none;
   }
