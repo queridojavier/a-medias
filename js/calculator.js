@@ -10,6 +10,7 @@ class Calculator {
     this.defaultValues = { ...DEFAULTS };
     this.elements = {};
     this.onStateChange = null; // Callback cuando cambia el estado
+    this.lastResults = null;
     // Versión con debounce del cálculo para mejor rendimiento
     this.debouncedCalculate = debounce(() => this.calculate(), TIMINGS.CALC_DEBOUNCE);
   }
@@ -159,8 +160,7 @@ class Calculator {
     const transferencia1 = round2(sobrante1 - ajuste);
     const transferencia2 = round2(sobrante2 + ajuste);
 
-    // Actualizar UI
-    this.updateResults({
+    this.lastResults = {
       ingresoTotal,
       dineroRepartir,
       proportion1,
@@ -168,7 +168,14 @@ class Calculator {
       comun2,
       transferencia1,
       transferencia2,
-    });
+      sobrante1,
+      sobrante2,
+      fondoComun,
+      ajuste,
+    };
+
+    // Actualizar UI
+    this.updateResults(this.lastResults);
 
     // Guardar estado
     this.saveState();
@@ -321,6 +328,19 @@ class Calculator {
    */
   getIncomes() {
     return {
+      nomina1: readNumber('nomina1'),
+      nomina2: readNumber('nomina2'),
+      mode: this.mode,
+    };
+  }
+
+  getComputedState() {
+    if (!this.lastResults) {
+      this.calculate();
+    }
+
+    return {
+      ...this.lastResults,
       nomina1: readNumber('nomina1'),
       nomina2: readNumber('nomina2'),
       mode: this.mode,

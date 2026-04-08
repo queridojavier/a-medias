@@ -234,93 +234,93 @@ class ReimbursementsManager {
       : 'Pago único';
     const paymentsList = (debt.payments || []).length
       ? debt.payments.map((p) => `
-          <li class="flex justify-between gap-3 py-1 border-b border-slate-100 last:border-0 text-sm">
+          <li class="reimbursement-history-item">
             <div>
-              <span class="font-medium text-slate-700">${formatMoney(p.amount)}</span>
-              ${p.note ? `<span class="text-xs text-slate-500 block">${escapeHtml(p.note)}</span>` : ''}
+              <span class="reimbursement-history-amount">${formatMoney(p.amount)}</span>
+              ${p.note ? `<span class="reimbursement-history-note">${escapeHtml(p.note)}</span>` : ''}
             </div>
-            <span class="text-xs text-slate-500 whitespace-nowrap">${escapeHtml(p.date || '')}</span>
+            <span class="reimbursement-history-date">${escapeHtml(p.date || '')}</span>
           </li>
         `).join('')
-      : '<li class="text-sm text-slate-500 italic">Aún no hay pagos registrados.</li>';
+      : '<li class="reimbursement-history-empty">Aún no hay pagos registrados.</li>';
 
     return `
-      <article class="card space-y-4" data-debt-id="${escapeHtml(debt.id)}">
-        <header class="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
+      <article class="reimbursement-card" data-debt-id="${escapeHtml(debt.id)}">
+        <header class="reimbursement-card-header">
           <div>
-            <h3 class="text-lg font-semibold text-slate-800">${escapeHtml(debt.concept)}</h3>
-            <p class="text-sm text-slate-500">Pagó: ${payerLabel} · ${installmentsLabel}</p>
-            ${debt.note ? `<p class="mt-1 text-xs text-slate-500">${escapeHtml(debt.note)}</p>` : ''}
+            <h3 class="reimbursement-card-title">${escapeHtml(debt.concept)}</h3>
+            <p class="reimbursement-card-meta">Pagó: ${payerLabel} · ${installmentsLabel}</p>
+            ${debt.note ? `<p class="reimbursement-card-note">${escapeHtml(debt.note)}</p>` : ''}
           </div>
-          <div class="text-right">
-            <p class="text-sm text-slate-500">Total</p>
-            <p class="text-2xl font-semibold text-slate-800">${formatMoney(debt.total)}</p>
+          <div class="reimbursement-card-total">
+            <p>Total</p>
+            <strong>${formatMoney(debt.total)}</strong>
           </div>
         </header>
-        <div class="flex flex-wrap gap-2 md:justify-end">
-          <button type="button" class="inline-flex items-center gap-1 rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-600 hover:border-emerald-400 hover:text-emerald-600 transition"
+        <div class="reimbursement-card-actions">
+          <button type="button" class="pill-button"
                   data-debt-action="settle" data-debt-id="${escapeHtml(debt.id)}">
             Liquidar deuda
           </button>
-          <button type="button" class="inline-flex items-center gap-1 rounded-lg border border-rose-200 px-3 py-1.5 text-xs font-medium text-rose-600 bg-rose-50 hover:bg-rose-100 transition"
+          <button type="button" class="pill-button pill-button--danger"
                   data-debt-action="delete" data-debt-id="${escapeHtml(debt.id)}">
             Eliminar
           </button>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-          <div class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-            <p class="text-slate-500">Tu parte</p>
-            <p class="font-semibold text-slate-800">${formatMoney(debt.myShare)}</p>
+        <div class="reimbursement-card-grid">
+          <div class="reimbursement-mini-card">
+            <p>Tu parte</p>
+            <strong>${formatMoney(debt.myShare)}</strong>
           </div>
-          <div class="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
-            <p class="text-slate-500">Parte pareja</p>
-            <p class="font-semibold text-slate-800">${formatMoney(debt.partnerShare)}</p>
+          <div class="reimbursement-mini-card">
+            <p>Parte pareja</p>
+            <strong>${formatMoney(debt.partnerShare)}</strong>
           </div>
-          <div class="rounded-lg border border-slate-200 px-3 py-2 ${pending === 0 ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}">
-            <p class="text-slate-500">${owedLabel}</p>
-            <p class="font-semibold ${pending === 0 ? 'text-emerald-700' : 'text-amber-700'}">${pending === 0 ? 'Liquidado' : formatMoney(pending)}</p>
+          <div class="reimbursement-mini-card ${pending === 0 ? 'is-settled' : 'is-pending'}">
+            <p>${owedLabel}</p>
+            <strong>${pending === 0 ? 'Liquidado' : formatMoney(pending)}</strong>
           </div>
         </div>
 
-        <div>
-          <div class="flex items-center justify-between text-sm text-slate-500 mb-1">
+        <div class="reimbursement-progress">
+          <div class="reimbursement-progress-meta">
             <span>Progreso de devolución</span>
             <span>${pct}%</span>
           </div>
-          <div class="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
-            <div class="h-full bg-[var(--primary)] transition-all" style="width:${pct}%;"></div>
+          <div class="reimbursement-progress-track">
+            <div class="reimbursement-progress-fill" style="width:${pct}%;"></div>
           </div>
         </div>
 
-        <section class="space-y-2">
-          <h4 class="text-sm font-semibold text-slate-600 uppercase tracking-wide">Historial</h4>
-          <ul class="divide-y divide-slate-100 rounded-lg border border-slate-200 bg-white overflow-hidden">
+        <section class="reimbursement-history">
+          <h4>Historial</h4>
+          <ul>
             ${paymentsList}
           </ul>
         </section>
 
-        <form class="payment-form grid gap-3 md:grid-cols-[repeat(auto-fit,minmax(140px,1fr))]" data-debt-id="${escapeHtml(debt.id)}">
-          <div class="md:col-span-1">
-            <label class="text-xs text-slate-500 block mb-1">Importe</label>
-            <div class="relative">
-              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">€</span>
-              <input name="amount" type="number" step="0.01" min="0" class="pl-7 w-full rounded-lg border border-slate-300 py-2 px-2 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200" placeholder="${debt.installmentAmount}">
+        <form class="payment-form reimbursement-payment-form" data-debt-id="${escapeHtml(debt.id)}">
+          <div>
+            <label class="reimbursement-payment-label">Importe</label>
+            <div class="ios-input-wrapper">
+              <span class="ios-input-prefix">€</span>
+              <input name="amount" type="number" step="0.01" min="0" class="ios-input" placeholder="${debt.installmentAmount}">
             </div>
           </div>
           <div>
-            <label class="text-xs text-slate-500 block mb-1">Fecha</label>
-            <input name="date" type="date" class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200" value="${todayISO()}">
+            <label class="reimbursement-payment-label">Fecha</label>
+            <input name="date" type="date" class="ios-input" value="${todayISO()}">
           </div>
-          <div class="md:col-span-2">
-            <label class="text-xs text-slate-500 block mb-1">Nota (opcional)</label>
-            <input name="note" type="text" class="w-full rounded-lg border border-slate-300 py-2 px-3 focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200" placeholder="Bizum, transferencia, efectivo...">
+          <div>
+            <label class="reimbursement-payment-label">Nota</label>
+            <input name="note" type="text" class="ios-input" placeholder="Bizum, transferencia, efectivo...">
           </div>
-          <div class="md:col-span-full flex flex-col gap-2 sm:flex-row sm:items-center">
-            <button type="submit" class="inline-flex justify-center rounded-lg bg-emerald-500 text-white font-semibold px-4 py-2 shadow hover:bg-emerald-600 transition">
+          <div class="reimbursement-payment-actions">
+            <button type="submit" class="ios-btn-primary">
               Registrar pago
             </button>
-            <p class="payment-error text-xs text-rose-600"></p>
+            <p class="payment-error ios-error"></p>
           </div>
         </form>
       </article>

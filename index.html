@@ -4,387 +4,657 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <title>A Medias - Calculadora de gastos en pareja</title>
+  <title>A Medias - Gestión común</title>
 
-  <!-- QRCode.js - Generación local de QR -->
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Fuentes -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- PWA -->
   <link rel="manifest" href="./manifest.json">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
   <link rel="icon" href="./icons/icon-192.png" type="image/png">
   <meta name="apple-mobile-web-app-title" content="A Medias">
-  <meta name="theme-color" content="#F8FAFC">
+  <meta name="theme-color" content="#09090B">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="description" content="Calculadora para dividir gastos en pareja de forma justa y transparente">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Resumen, gastos comunes y reparto en pareja">
 
-  <!-- Estilos -->
   <link rel="stylesheet" href="./css/styles.css">
 </head>
 
 <body>
-  <!-- Offline banner -->
   <div id="offline-banner" class="offline-banner">
     Sin conexión. Los cambios se guardan localmente.
   </div>
 
-  <!-- Sync indicator -->
-  <div id="sync-indicator" class="sync-indicator idle" style="display:none;">
+  <div id="sync-indicator" class="sync-indicator idle">
     <span>Local</span>
   </div>
 
-  <!-- App wrapper -->
-  <div class="app-wrapper">
+  <div class="app-shell">
+    <div class="app-glow app-glow--top"></div>
+    <div class="app-glow app-glow--bottom"></div>
 
-    <!-- Mobile header (visible solo en móvil) -->
-    <header class="app-header">
-      <div class="app-header-content">
-        <img src="./icons/icon-192.png" alt="Logo" class="app-header-logo">
-        <h1 class="app-header-title">A <span>Medias</span></h1>
-      </div>
-    </header>
-
-    <!-- Main scrollable area -->
-    <main class="app-main" id="app-main">
-
-      <!-- ====== TAB: División mensual ====== -->
-      <section class="tab-section" data-tab-section="calc">
-
-        <!-- Datos del Mes -->
-        <div class="ios-card">
-          <div class="ios-card-header">
-            <h2 class="ios-card-title">Datos del Mes</h2>
-          </div>
-
-          <!-- Toggle modo -->
-          <div class="ios-segment">
-            <button id="mode-prop" class="ios-segment-btn active" type="button" aria-pressed="true">Proporcional</button>
-            <button id="mode-eq" class="ios-segment-btn" type="button" aria-pressed="false">50 / 50</button>
-          </div>
-          <p id="mode-hint" class="ios-hint">Reparte según el peso de cada nómina.</p>
-
-          <!-- Ingresos -->
-          <div class="ios-form-group">
-            <label for="nomina1" class="ios-label">Tu nómina</label>
-            <div class="ios-input-wrapper">
-              <span class="ios-input-prefix">€</span>
-              <input type="number" id="nomina1" class="ios-input" placeholder="1800" value="1800" step="0.01" inputmode="decimal" min="0">
-            </div>
-          </div>
-
-          <div class="ios-form-group">
-            <label for="nomina2" class="ios-label">Nómina de tu pareja</label>
-            <div class="ios-input-wrapper">
-              <span class="ios-input-prefix">€</span>
-              <input type="number" id="nomina2" class="ios-input" placeholder="1500" value="1500" step="0.01" inputmode="decimal" min="0">
-            </div>
-          </div>
-
-          <div class="ios-separator"></div>
-
-          <div class="ios-form-group">
-            <label for="fondoComun" class="ios-label">Aportación cuenta común</label>
-            <div class="ios-input-wrapper">
-              <span class="ios-input-prefix">€</span>
-              <input type="number" id="fondoComun" class="ios-input" placeholder="1200" value="1200" step="0.01" inputmode="decimal" min="0">
-            </div>
-          </div>
-
-          <div class="ios-form-group">
-            <label for="ajuste" class="ios-label">Ajuste entre vosotros</label>
-            <div class="ios-input-wrapper">
-              <span class="ios-input-prefix">€</span>
-              <input type="number" id="ajuste" class="ios-input" placeholder="0" value="0" step="0.01" inputmode="decimal">
-            </div>
-            <p class="ios-hint">Positivo si te deben a ti, negativo si debes tú.</p>
-          </div>
-
-          <button id="btnReset" class="ios-btn-text" type="button">Restablecer valores</button>
+    <div class="app-frame">
+      <header class="app-header">
+        <div>
+          <p class="app-kicker">A Medias</p>
+          <h1 class="app-title">Control de la cuenta común</h1>
         </div>
+        <p id="summary-month-label" class="app-header-note">Último mes cargado</p>
+      </header>
 
-        <!-- Resumen -->
-        <div class="ios-card">
-          <div class="ios-card-header">
-            <h2 class="ios-card-title">Resumen</h2>
-          </div>
-
-          <div class="ios-row" aria-live="polite">
-            <span class="ios-row-label">Ingresos totales</span>
-            <span id="ingresoTotal" class="ios-row-value">3.300,00 €</span>
-          </div>
-          <div class="ios-row">
-            <span class="ios-row-label">Dinero a repartir</span>
-            <span id="dineroRepartir" class="ios-row-value ios-row-value--accent">2.100,00 €</span>
-          </div>
-
-          <!-- Donut -->
-          <div class="ios-donut-section">
-            <div class="ios-donut-container">
-              <div class="donut" id="donut" aria-label="Distribución de aportación">
-                <div class="donut-inner"></div>
-                <div class="donut-center">
-                  <span id="p1Center" class="donut-value">60%</span>
+      <main class="app-main" id="app-main">
+        <section class="tab-section" data-tab-section="summary">
+          <div class="hero-panel">
+            <div class="hero-copy">
+              <p class="hero-eyebrow">Resumen mensual</p>
+              <h2>Una vista rápida de gastos, aportaciones y margen operativo.</h2>
+              <p>El “ahorro” de aquí abajo es en realidad colchón para comida, ocio y los pagos variables que no están en los gastos fijos.</p>
+            </div>
+            <div class="hero-distribution">
+              <p class="hero-distribution-label">Reparto actual de ingresos</p>
+              <div id="summary-distribution-bar" class="distribution-bar">
+                <span></span>
+              </div>
+              <div class="distribution-legend">
+                <div>
+                  <small id="summary-distribution-mine-label">Tú</small>
+                  <strong id="summary-distribution-mine">50%</strong>
+                </div>
+                <div>
+                  <small id="summary-distribution-partner-label">Pareja</small>
+                  <strong id="summary-distribution-partner">50%</strong>
                 </div>
               </div>
-              <ul class="donut-legend">
-                <li>
-                  <span class="donut-dot" style="background:var(--primary)"></span>
-                  <span class="donut-legend-label">Tu parte</span>
-                  <span id="porcentaje1" class="donut-legend-value">60%</span>
-                </li>
-                <li>
-                  <span class="donut-dot" style="background:var(--muted)"></span>
-                  <span class="donut-legend-label">Pareja</span>
-                  <span id="porcentaje2" class="donut-legend-value">40%</span>
-                </li>
-              </ul>
             </div>
           </div>
 
-          <!-- Aportaciones -->
-          <div class="ios-row">
-            <span class="ios-row-label">Tu aportación al fondo</span>
-            <span id="comun1" class="ios-row-value">—</span>
-          </div>
-          <div class="ios-row">
-            <span class="ios-row-label">Aportación pareja</span>
-            <span id="comun2" class="ios-row-value">—</span>
+          <div class="stats-grid">
+            <article class="metric-card">
+              <span class="metric-label">Gastos comunes fijos</span>
+              <strong id="summary-common-expenses" class="metric-value">0,00 €</strong>
+              <p class="metric-note">Suma mensual de la tabla de gastos comunes.</p>
+            </article>
+            <article class="metric-card">
+              <span class="metric-label">Aportación cuenta común</span>
+              <strong id="summary-common-fund" class="metric-value">0,00 €</strong>
+              <p class="metric-note">Lo que decidís dejar cada mes en la cuenta compartida.</p>
+            </article>
+            <article class="metric-card">
+              <span id="summary-my-contribution-label" class="metric-label">Tu aportación último mes</span>
+              <strong id="summary-my-contribution" class="metric-value">0,00 €</strong>
+              <p id="summary-my-salary" class="metric-note">0,00 €</p>
+            </article>
+            <article class="metric-card">
+              <span id="summary-partner-contribution-label" class="metric-label">Aportación pareja último mes</span>
+              <strong id="summary-partner-contribution" class="metric-value">0,00 €</strong>
+              <p id="summary-partner-salary" class="metric-note">0,00 €</p>
+            </article>
           </div>
 
-          <p id="warning" class="ios-warning"></p>
-        </div>
+          <div class="summary-layout">
+            <article class="summary-card summary-card--accent">
+              <div class="summary-card-header">
+                <div>
+                  <p class="summary-card-kicker">Margen operativo</p>
+                  <h3 id="summary-buffer">0,00 €</h3>
+                </div>
+                <span class="summary-chip">Flexible</span>
+              </div>
+              <p id="summary-buffer-hint" class="summary-card-text">Colchón para comida, ocio y resto de gastos variables.</p>
+            </article>
 
-        <!-- Transferencias -->
-        <div class="ios-card" aria-live="polite">
-          <div class="ios-card-header">
-            <h2 class="ios-card-title">Transferencias</h2>
+            <article class="summary-card">
+              <div class="summary-card-header">
+                <div>
+                  <p class="summary-card-kicker">Cobertura de gastos fijos</p>
+                  <h3 id="summary-coverage-meta">0%</h3>
+                </div>
+              </div>
+              <div class="coverage-track">
+                <div id="summary-coverage" class="coverage-fill"></div>
+              </div>
+              <p class="summary-card-text">Si pasa del 100%, conviene subir la cuenta común o bajar gasto fijo.</p>
+            </article>
           </div>
+        </section>
 
-          <div class="ios-transfers">
-            <div class="ios-transfer-box ios-transfer-box--primary">
-              <span class="ios-transfer-label">Transferir a tu cuenta</span>
-              <span id="transferencia1" class="ios-transfer-amount">1.095,45 €</span>
+        <section class="tab-section hidden" data-tab-section="expenses">
+          <div class="section-intro">
+            <div>
+              <p class="section-kicker">Gastos comunes</p>
+              <h2 class="section-title">Tabla editable de gastos fijos</h2>
             </div>
-            <div class="ios-transfer-box ios-transfer-box--green">
-              <span class="ios-transfer-label">Transferir a cuenta pareja</span>
-              <span id="transferencia2" class="ios-transfer-amount">1.004,55 €</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ====== TAB: Reembolsos ====== -->
-      <section class="tab-section hidden" data-tab-section="reimburse">
-
-        <div class="ios-card" id="debt-form-card">
-          <div class="ios-card-header">
-            <h2 class="ios-card-title">Nuevo reembolso</h2>
-            <p class="ios-card-subtitle">Registra cuando uno adelanta un pago para el otro.</p>
+            <button id="common-expenses-add" type="button" class="ios-btn-secondary">Añadir fila</button>
           </div>
 
-          <form id="debt-form" class="ios-form">
-            <div class="ios-form-group">
-              <label for="debt-concept" class="ios-label">Concepto</label>
-              <input type="text" id="debt-concept" class="ios-input" placeholder="Reforma, viaje, compra..." required>
-            </div>
+          <div class="stats-grid stats-grid--expenses">
+            <article class="metric-card">
+              <span class="metric-label">Mensual</span>
+              <strong id="common-expenses-total-monthly" class="metric-value">0,00 €</strong>
+            </article>
+            <article class="metric-card">
+              <span class="metric-label">Anual</span>
+              <strong id="common-expenses-total-annual" class="metric-value">0,00 €</strong>
+            </article>
+            <article class="metric-card">
+              <span class="metric-label">Control</span>
+              <strong id="common-expenses-updated-at" class="metric-value metric-value--small">Actualizado hoy</strong>
+            </article>
+          </div>
 
-            <div class="ios-form-row">
+          <article class="table-card">
+            <div class="table-scroll">
+              <table class="expenses-table">
+                <thead>
+                  <tr>
+                    <th>Concepto</th>
+                    <th>Mensual</th>
+                    <th>Anual</th>
+                    <th>Vencimiento</th>
+                    <th>Categoría</th>
+                    <th>Notas</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="common-expenses-body"></tbody>
+              </table>
+            </div>
+            <div id="common-expenses-empty" class="empty-table hidden">
+              No hay gastos comunes todavía.
+            </div>
+          </article>
+        </section>
+
+        <section class="tab-section hidden" data-tab-section="calc">
+          <div class="section-intro">
+            <div>
+              <p class="section-kicker">Calculadora principal</p>
+              <h2 class="section-title">Decidid cuánto dejáis y cuánto aporta cada uno</h2>
+            </div>
+          </div>
+
+          <div class="calc-layout">
+            <article class="panel-card">
+              <div class="panel-card-header">
+                <h3>Datos del mes</h3>
+                <p>Usa el reparto proporcional o fuerza un 50 / 50 exacto.</p>
+              </div>
+
+              <div class="ios-segment">
+                <button id="mode-prop" class="ios-segment-btn active" type="button" aria-pressed="true">Proporcional</button>
+                <button id="mode-eq" class="ios-segment-btn" type="button" aria-pressed="false">50 / 50</button>
+              </div>
+              <p id="mode-hint" class="ios-hint">Reparte según el peso de cada nómina.</p>
+
               <div class="ios-form-group">
-                <label for="debt-total" class="ios-label">Total pagado</label>
+                <label for="nomina1" id="label-nomina1" class="ios-label">Tu nómina</label>
                 <div class="ios-input-wrapper">
                   <span class="ios-input-prefix">€</span>
-                  <input type="number" id="debt-total" class="ios-input" placeholder="5000" step="0.01" min="0" required>
+                  <input type="number" id="nomina1" class="ios-input" placeholder="1800" value="1800" step="0.01" inputmode="decimal" min="0">
                 </div>
               </div>
+
               <div class="ios-form-group">
-                <label for="debt-my-share" class="ios-label">Tu parte</label>
+                <label for="nomina2" id="label-nomina2" class="ios-label">Nómina de tu pareja</label>
                 <div class="ios-input-wrapper">
                   <span class="ios-input-prefix">€</span>
-                  <input type="number" id="debt-my-share" class="ios-input" placeholder="2500" step="0.01" min="0" required>
+                  <input type="number" id="nomina2" class="ios-input" placeholder="1500" value="1500" step="0.01" inputmode="decimal" min="0">
                 </div>
               </div>
-            </div>
 
-            <!-- Quick split buttons -->
-            <div class="ios-quick-split">
-              <div class="ios-segment ios-segment--small">
-                <button type="button" id="debt-mode-prop" class="ios-segment-btn debt-mode-btn" aria-pressed="false">Auto</button>
-                <button type="button" id="debt-mode-eq" class="ios-segment-btn debt-mode-btn" aria-pressed="false">50/50</button>
-              </div>
-              <button type="button" id="btn-share-action" class="ios-btn-text ios-btn-text--small">Según ingresos</button>
-              <p class="ios-hint">Lo que te corresponde del total.</p>
-            </div>
+              <div class="ios-separator"></div>
 
-            <div class="ios-form-group">
-              <span class="ios-label">¿Quién adelantó el pago?</span>
-              <div class="ios-radio-group">
-                <label class="ios-radio">
-                  <input type="radio" name="debt-payer" value="me" checked>
-                  <span class="ios-radio-label">Yo</span>
-                </label>
-                <label class="ios-radio">
-                  <input type="radio" name="debt-payer" value="partner">
-                  <span class="ios-radio-label">Mi pareja</span>
-                </label>
-              </div>
-            </div>
-
-            <div class="ios-form-row">
               <div class="ios-form-group">
-                <label for="debt-installments" class="ios-label">Cuotas</label>
-                <input type="number" id="debt-installments" class="ios-input" value="5" min="1" step="1" required>
+                <label for="fondoComun" class="ios-label">Dinero para la cuenta común</label>
+                <div class="ios-input-wrapper">
+                  <span class="ios-input-prefix">€</span>
+                  <input type="number" id="fondoComun" class="ios-input" placeholder="1200" value="1200" step="0.01" inputmode="decimal" min="0">
+                </div>
               </div>
+
               <div class="ios-form-group">
-                <label for="debt-first-date" class="ios-label">Fecha inicio</label>
-                <input type="date" id="debt-first-date" class="ios-input">
+                <label for="ajuste" class="ios-label">Ajuste entre vosotros</label>
+                <div class="ios-input-wrapper">
+                  <span class="ios-input-prefix">€</span>
+                  <input type="number" id="ajuste" class="ios-input" placeholder="0" value="0" step="0.01" inputmode="decimal">
+                </div>
+                <p class="ios-hint">Positivo si te deben a ti, negativo si debes tú.</p>
               </div>
+
+              <button id="btnReset" class="ios-btn-text" type="button">Restablecer valores</button>
+            </article>
+
+            <article class="panel-card">
+              <div class="panel-card-header">
+                <h3>Resumen</h3>
+                <p>Así queda el mes con la configuración actual.</p>
+              </div>
+
+              <div class="summary-rows">
+                <div class="ios-row" aria-live="polite">
+                  <span class="ios-row-label">Ingresos totales</span>
+                  <span id="ingresoTotal" class="ios-row-value">3.300,00 €</span>
+                </div>
+                <div class="ios-row">
+                  <span class="ios-row-label">Dinero fuera de la común</span>
+                  <span id="dineroRepartir" class="ios-row-value ios-row-value--accent">2.100,00 €</span>
+                </div>
+                <div class="ios-row">
+                  <span id="label-comun1" class="ios-row-label">Tu aportación al fondo</span>
+                  <span id="comun1" class="ios-row-value">—</span>
+                </div>
+                <div class="ios-row">
+                  <span id="label-comun2" class="ios-row-label">Aportación pareja</span>
+                  <span id="comun2" class="ios-row-value">—</span>
+                </div>
+              </div>
+
+              <div class="donut-panel">
+                <div class="donut" id="donut" aria-label="Distribución de aportación">
+                  <div class="donut-inner"></div>
+                  <div class="donut-center">
+                    <span id="p1Center" class="donut-value">60%</span>
+                  </div>
+                </div>
+                <ul class="donut-legend">
+                  <li>
+                    <span class="donut-dot donut-dot--primary"></span>
+                    <span id="label-porcentaje1" class="donut-legend-label">Tu peso</span>
+                    <span id="porcentaje1" class="donut-legend-value">60%</span>
+                  </li>
+                  <li>
+                    <span class="donut-dot donut-dot--secondary"></span>
+                    <span id="label-porcentaje2" class="donut-legend-label">Pareja</span>
+                    <span id="porcentaje2" class="donut-legend-value">40%</span>
+                  </li>
+                </ul>
+              </div>
+
+              <p id="warning" class="ios-warning"></p>
+            </article>
+
+            <article class="panel-card">
+              <div class="panel-card-header">
+                <h3>Transferencias finales</h3>
+                <p>Lo que os quedaría a cada uno tras la aportación común y el ajuste.</p>
+              </div>
+
+              <div class="ios-transfers">
+                <div class="ios-transfer-box ios-transfer-box--primary">
+                  <span id="label-transferencia1" class="ios-transfer-label">Se queda en tu cuenta</span>
+                  <span id="transferencia1" class="ios-transfer-amount">1.095,45 €</span>
+                </div>
+                <div class="ios-transfer-box ios-transfer-box--green">
+                  <span id="label-transferencia2" class="ios-transfer-label">Se queda en cuenta pareja</span>
+                  <span id="transferencia2" class="ios-transfer-amount">1.004,55 €</span>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="tab-section hidden" data-tab-section="settle">
+          <div class="section-intro">
+            <div>
+              <p class="section-kicker">Reembolsos y divisor</p>
+              <h2 class="section-title">Gestiona adelantos y reparte pagos puntuales</h2>
             </div>
+          </div>
 
-            <div class="ios-form-group">
-              <label for="debt-note" class="ios-label">Notas (opcional)</label>
-              <textarea id="debt-note" rows="2" class="ios-input ios-textarea" placeholder="Detalle extra..."></textarea>
+          <div class="settle-layout">
+            <article class="panel-card" id="debt-form-card">
+              <div class="panel-card-header">
+                <h3>Nuevo reembolso</h3>
+                <p>Registra cuando uno adelanta un pago que luego se devuelve.</p>
+              </div>
+
+              <form id="debt-form" class="ios-form">
+                <div class="ios-form-group">
+                  <label for="debt-concept" class="ios-label">Concepto</label>
+                  <input type="text" id="debt-concept" class="ios-input" placeholder="Viaje, derrama, billetes..." required>
+                </div>
+
+                <div class="ios-form-row">
+                  <div class="ios-form-group">
+                    <label for="debt-total" class="ios-label">Total pagado</label>
+                    <div class="ios-input-wrapper">
+                      <span class="ios-input-prefix">€</span>
+                      <input type="number" id="debt-total" class="ios-input" placeholder="500" step="0.01" min="0" required>
+                    </div>
+                  </div>
+                  <div class="ios-form-group">
+                    <label for="debt-my-share" class="ios-label">Tu parte</label>
+                    <div class="ios-input-wrapper">
+                      <span class="ios-input-prefix">€</span>
+                      <input type="number" id="debt-my-share" class="ios-input" placeholder="250" step="0.01" min="0" required>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="ios-quick-split">
+                  <div class="ios-segment ios-segment--small">
+                    <button type="button" id="debt-mode-prop" class="ios-segment-btn debt-mode-btn" aria-pressed="false">Auto</button>
+                    <button type="button" id="debt-mode-eq" class="ios-segment-btn debt-mode-btn" aria-pressed="false">50/50</button>
+                  </div>
+                  <button type="button" id="btn-share-action" class="ios-btn-text ios-btn-text--small">Según ingresos</button>
+                  <p class="ios-hint">Rellena tu parte según el reparto actual.</p>
+                </div>
+
+                <div class="ios-form-group">
+                  <span class="ios-label">¿Quién adelantó el pago?</span>
+                  <div class="ios-radio-group">
+                    <label class="ios-radio">
+                      <input type="radio" name="debt-payer" value="me" checked>
+                      <span class="ios-radio-label">Yo</span>
+                    </label>
+                    <label class="ios-radio">
+                      <input type="radio" name="debt-payer" value="partner">
+                      <span class="ios-radio-label">Mi pareja</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="ios-form-row">
+                  <div class="ios-form-group">
+                    <label for="debt-installments" class="ios-label">Cuotas</label>
+                    <input type="number" id="debt-installments" class="ios-input" value="5" min="1" step="1" required>
+                  </div>
+                  <div class="ios-form-group">
+                    <label for="debt-first-date" class="ios-label">Fecha inicio</label>
+                    <input type="date" id="debt-first-date" class="ios-input">
+                  </div>
+                </div>
+
+                <div class="ios-form-group">
+                  <label for="debt-note" class="ios-label">Notas</label>
+                  <textarea id="debt-note" rows="2" class="ios-input ios-textarea" placeholder="Detalle extra..."></textarea>
+                </div>
+
+                <div id="debt-preview" class="ios-preview">
+                  Registra el total y tu parte para calcular cuánto queda pendiente.
+                </div>
+                <p id="debt-error" class="ios-error"></p>
+
+                <button type="submit" class="ios-btn-primary">Guardar reembolso</button>
+              </form>
+            </article>
+
+            <article class="panel-card">
+              <div class="panel-card-header">
+                <h3>Divisor rápido</h3>
+                <p>Para cenas, regalos o cualquier pago puntual entre varias personas.</p>
+              </div>
+
+              <div class="ios-form-group">
+                <label for="split-total" class="ios-label">Importe total</label>
+                <div class="ios-input-wrapper">
+                  <span class="ios-input-prefix">€</span>
+                  <input type="number" id="split-total" class="ios-input" placeholder="120" value="60" step="0.01" min="0" inputmode="decimal">
+                </div>
+              </div>
+
+              <div class="ios-form-group">
+                <span class="ios-label">Dividir entre</span>
+                <div class="ios-chips">
+                  <button type="button" class="ios-chip ios-chip--active" data-split-count="2">2</button>
+                  <button type="button" class="ios-chip" data-split-count="3">3</button>
+                  <button type="button" class="ios-chip" data-split-count="4">4</button>
+                  <button type="button" class="ios-chip" data-split-count="6">6</button>
+                </div>
+              </div>
+
+              <div class="ios-form-group">
+                <label for="split-count" class="ios-label">Personas</label>
+                <input type="number" id="split-count" class="ios-input" value="2" min="1" step="1">
+              </div>
+
+              <div class="split-result-card">
+                <p class="ios-result-label">Cada persona paga</p>
+                <p id="split-amount-each" class="ios-result-amount">0,00 €</p>
+                <p id="split-context" class="ios-result-context">Divide al instante cualquier gasto.</p>
+                <div id="split-detail" class="ios-preview">
+                  Introduce el total y el número de personas.
+                </div>
+                <p id="split-remainder" class="ios-warning"></p>
+              </div>
+            </article>
+          </div>
+
+          <div id="debt-list-wrapper">
+            <div id="debt-empty" class="panel-card ios-empty-state">
+              <p>Cuando registres un adelanto aparecerá aquí para hacer seguimiento.</p>
             </div>
-
-            <div id="debt-preview" class="ios-preview">
-              Registra el total y tu parte para calcular cuánto queda pendiente.
-            </div>
-
-            <p id="debt-error" class="ios-error"></p>
-
-            <button type="submit" class="ios-btn-primary">Guardar reembolso</button>
-          </form>
-        </div>
-
-        <div id="debt-list-wrapper">
-          <div id="debt-empty" class="ios-card ios-empty-state">
-            <p>Cuando registres un adelanto aparecerá aquí para el seguimiento.</p>
+            <div id="debt-list" class="ios-debt-list"></div>
           </div>
-          <div id="debt-list" class="ios-debt-list"></div>
-        </div>
-      </section>
+        </section>
 
-      <!-- ====== TAB: Divisor rápido ====== -->
-      <section class="tab-section hidden" data-tab-section="split">
-        <div class="ios-card">
-          <div class="ios-card-header">
-            <h2 class="ios-card-title">Divisor rápido</h2>
-            <p class="ios-card-subtitle">Divide una cuenta entre dos o más personas.</p>
-          </div>
-
-          <div class="ios-form-group">
-            <label for="split-total" class="ios-label">Importe total</label>
-            <div class="ios-input-wrapper">
-              <span class="ios-input-prefix">€</span>
-              <input type="number" id="split-total" class="ios-input" placeholder="120" value="60" step="0.01" min="0" inputmode="decimal">
+        <section class="tab-section hidden" data-tab-section="settings">
+          <div class="section-intro">
+            <div>
+              <p class="section-kicker">Configuración</p>
+              <h2 class="section-title">Privacidad, perfiles y categorías</h2>
             </div>
           </div>
 
-          <div class="ios-form-group">
-            <span class="ios-label">Dividir entre</span>
-            <div class="ios-chips">
-              <button type="button" class="ios-chip ios-chip--active" data-split-count="2">2</button>
-              <button type="button" class="ios-chip" data-split-count="3">3</button>
-              <button type="button" class="ios-chip" data-split-count="4">4</button>
-              <button type="button" class="ios-chip" data-split-count="6">6</button>
-            </div>
+          <div class="summary-layout">
+            <article class="summary-card summary-card--accent">
+              <div class="summary-card-header">
+                <div>
+                  <p class="summary-card-kicker">Guardado</p>
+                  <h3>Siempre local</h3>
+                </div>
+                <span class="summary-chip">Privado</span>
+              </div>
+              <p class="summary-card-text">
+                Todos los cambios se guardan automáticamente en este dispositivo para mantener la privacidad.
+                No hace falta crear cuenta ni subir datos a un servidor.
+              </p>
+            </article>
+
+            <article class="summary-card">
+              <div class="summary-card-header">
+                <div>
+                  <p class="summary-card-kicker">Plantilla en pareja</p>
+                  <h3>Sincronización por enlace</h3>
+                </div>
+              </div>
+              <p id="share-card-description" class="summary-card-text">
+                Crea un enlace privado para compartir la misma plantilla con tu pareja y mantener los datos actualizados en ambos dispositivos.
+              </p>
+              <p id="share-status-text" class="ios-share-status">Guardado localmente en este dispositivo.</p>
+              <p id="share-missing-config" class="ios-error hidden"></p>
+            </article>
           </div>
 
-          <div class="ios-form-group">
-            <label for="split-count" class="ios-label">Personas</label>
-            <input type="number" id="split-count" class="ios-input" value="2" min="1" step="1">
+          <div class="settings-layout">
+            <article class="panel-card settings-card">
+              <div class="panel-card-header">
+                <h3>Privacidad y datos</h3>
+                <p>Base para controlar guardado local, enlace compartido y futuras copias de seguridad.</p>
+              </div>
+
+              <div class="settings-group">
+                <div class="settings-row">
+                  <div>
+                    <p class="settings-row-title">Guardado automático local</p>
+                    <p class="settings-row-text">Activo siempre para no depender de cuentas ni servidores.</p>
+                  </div>
+                  <span class="summary-chip">Activo</span>
+                </div>
+
+                <div class="settings-row">
+                  <div>
+                    <p class="settings-row-title">Plantilla compartida</p>
+                    <p class="settings-row-text">Usad un enlace privado para editar ambos la misma base.</p>
+                  </div>
+                </div>
+
+                <div class="ios-share-actions">
+                  <button type="button" id="share-create" class="ios-btn-primary">Crear enlace seguro</button>
+                  <button type="button" id="share-copy" class="ios-btn-secondary hidden">Copiar enlace</button>
+                  <button type="button" id="share-leave" class="ios-btn-text hidden">Salir del enlace</button>
+                </div>
+
+                <div id="share-link-wrapper" class="ios-share-link hidden">
+                  <label for="share-link-input" class="ios-label">Enlace compartido</label>
+                  <div class="ios-share-link-row">
+                    <input type="text" id="share-link-input" readonly class="ios-input" value="">
+                    <button type="button" id="share-copy-secondary" class="ios-btn-secondary">Copiar</button>
+                  </div>
+                  <p class="ios-hint">Quien tenga este enlace podrá ver y editar la misma información.</p>
+                </div>
+
+                <div class="settings-placeholder-list">
+                  <div class="settings-placeholder-item">
+                    <span>Exportar copia local</span>
+                    <small>Próximo paso</small>
+                  </div>
+                  <div class="settings-placeholder-item">
+                    <span>Importar respaldo</span>
+                    <small>Próximo paso</small>
+                  </div>
+                  <div class="settings-placeholder-item">
+                    <span>Borrar datos del dispositivo</span>
+                    <small>Próximo paso</small>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <article class="panel-card settings-card">
+              <div class="panel-card-header">
+                <h3>Perfil de la pareja</h3>
+                <p>Dejamos la estructura preparada para personalizar quién es quién en la app.</p>
+              </div>
+
+              <div class="settings-group">
+                <div class="ios-form-row">
+                  <div class="ios-form-group">
+                    <label for="settings-name-me" class="ios-label">Tu nombre</label>
+                    <input type="text" id="settings-name-me" class="ios-input" placeholder="Ana">
+                  </div>
+                  <div class="ios-form-group">
+                    <label for="settings-name-partner" class="ios-label">Nombre de tu pareja</label>
+                    <input type="text" id="settings-name-partner" class="ios-input" placeholder="Carlos">
+                  </div>
+                </div>
+
+                <div class="ios-form-group">
+                  <span class="ios-label">¿Quién usa este dispositivo?</span>
+                  <div class="ios-radio-group">
+                    <label class="ios-radio">
+                      <input type="radio" name="settings-device-user" value="me" checked>
+                      <span class="ios-radio-label">Mi perfil</span>
+                    </label>
+                    <label class="ios-radio">
+                      <input type="radio" name="settings-device-user" value="partner">
+                      <span class="ios-radio-label">Perfil pareja</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="profile-preview-grid">
+                  <div class="profile-preview-card">
+                    <span class="profile-badge">Tú</span>
+                    <strong id="settings-profile-me-label">Tu perfil</strong>
+                    <p id="settings-profile-me-text">Nombre, color y rol en este dispositivo.</p>
+                  </div>
+                  <div class="profile-preview-card">
+                    <span class="profile-badge profile-badge--secondary">Pareja</span>
+                    <strong id="settings-profile-partner-label">Perfil pareja</strong>
+                    <p id="settings-profile-partner-text">Nombre visible y referencias en cálculos y resúmenes.</p>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <article class="panel-card settings-card">
+              <div class="panel-card-header">
+                <h3>Categorías de gastos</h3>
+                <p>Las categorías serán configurables para adaptar la tabla de gastos comunes a vuestra forma de organizaros.</p>
+              </div>
+
+              <div class="settings-group">
+                <div class="ios-share-link-row">
+                  <input type="text" id="settings-category-input" class="ios-input" placeholder="Nueva categoría">
+                  <button type="button" id="settings-category-add" class="ios-btn-secondary">Añadir</button>
+                </div>
+
+                <div id="settings-categories-list" class="settings-placeholder-list"></div>
+
+                <div class="settings-placeholder-list">
+                  <div class="settings-placeholder-item">
+                    <span>Asignar color por categoría</span>
+                    <small>Pendiente</small>
+                  </div>
+                </div>
+              </div>
+            </article>
           </div>
-        </div>
+        </section>
+      </main>
 
-        <div class="ios-card ios-result-card">
-          <p class="ios-result-label">Cada persona paga</p>
-          <p id="split-amount-each" class="ios-result-amount">0,00 €</p>
-          <p id="split-context" class="ios-result-context">Divide al instante cualquier gasto.</p>
-          <div id="split-detail" class="ios-preview">
-            Introduce el total y el número de personas.
-          </div>
-          <p id="split-remainder" class="ios-warning"></p>
-        </div>
-      </section>
-
-      <!-- ====== TAB: Compartir ====== -->
-      <section class="tab-section hidden" data-tab-section="share">
-        <div class="ios-card" id="share-card">
-          <div class="ios-card-header">
-            <h2 class="ios-card-title">Compartir datos</h2>
-            <p id="share-card-description" class="ios-card-subtitle">
-              Tus datos se guardan localmente. Crea un enlace para compartir sin registro.
-            </p>
-          </div>
-
-          <p id="share-status-text" class="ios-share-status">Guardado localmente en este dispositivo.</p>
-          <p id="share-missing-config" class="ios-error hidden"></p>
-
-          <div class="ios-share-actions">
-            <button type="button" id="share-create" class="ios-btn-primary">Crear enlace seguro</button>
-            <button type="button" id="share-copy" class="ios-btn-secondary hidden">Copiar enlace</button>
-            <button type="button" id="share-leave" class="ios-btn-text hidden">Salir del enlace</button>
-          </div>
-
-          <div id="share-link-wrapper" class="ios-share-link hidden">
-            <label for="share-link-input" class="ios-label">Enlace compartido</label>
-            <div class="ios-share-link-row">
-              <input type="text" id="share-link-input" readonly class="ios-input" value="">
-              <button type="button" id="share-copy-secondary" class="ios-btn-secondary ios-btn-icon">Copiar</button>
-            </div>
-            <p class="ios-hint">Solo quien tenga este enlace podrá ver y editar los datos.</p>
-          </div>
-        </div>
-
-        <!-- Footer info -->
-        <div class="ios-footer-info">
-          <p>A Medias v3.1 &middot; Local First + Cifrado E2E</p>
-        </div>
-      </section>
-
-    </main>
-
-    <!-- ====== Bottom Tab Bar (iOS style) ====== -->
-    <nav class="tab-bar" role="tablist">
-      <button class="tab-bar-item active" data-tab-target="calc" role="tab" aria-selected="true">
-        <svg class="tab-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="4" y="2" width="16" height="20" rx="2"/>
-          <line x1="8" y1="6" x2="16" y2="6"/>
-          <line x1="8" y1="10" x2="12" y2="10"/>
-          <line x1="8" y1="14" x2="16" y2="14"/>
-          <line x1="8" y1="18" x2="12" y2="18"/>
-        </svg>
-        <span class="tab-bar-label">División</span>
-      </button>
-      <button class="tab-bar-item" data-tab-target="reimburse" role="tab" aria-selected="false">
-        <svg class="tab-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
-        </svg>
-        <span class="tab-bar-label">Reembolsos</span>
-      </button>
-      <button class="tab-bar-item" data-tab-target="split" role="tab" aria-selected="false">
-        <svg class="tab-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"/>
-          <line x1="12" y1="8" x2="12" y2="16"/>
-          <line x1="8" y1="12" x2="16" y2="12"/>
-        </svg>
-        <span class="tab-bar-label">Divisor</span>
-      </button>
-      <button class="tab-bar-item" data-tab-target="share" role="tab" aria-selected="false">
-        <svg class="tab-bar-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="18" cy="5" r="3"/>
-          <circle cx="6" cy="12" r="3"/>
-          <circle cx="18" cy="19" r="3"/>
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
-          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-        </svg>
-        <span class="tab-bar-label">Compartir</span>
-      </button>
-    </nav>
-
+      <nav class="tab-bar" role="tablist">
+        <button class="tab-bar-item active" data-tab-target="summary" role="tab" aria-selected="true">
+          <span class="tab-bar-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3.5" y="4" width="17" height="16" rx="4"></rect>
+              <path d="M7 9h10"></path>
+              <path d="M7 13h6"></path>
+            </svg>
+          </span>
+          <span class="tab-bar-label">Resumen</span>
+        </button>
+        <button class="tab-bar-item" data-tab-target="expenses" role="tab" aria-selected="false">
+          <span class="tab-bar-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 4.5h14"></path>
+              <path d="M5 9.5h14"></path>
+              <path d="M5 14.5h9"></path>
+              <path d="M5 19.5h6"></path>
+            </svg>
+          </span>
+          <span class="tab-bar-label">Gastos</span>
+        </button>
+        <button class="tab-bar-item" data-tab-target="calc" role="tab" aria-selected="false">
+          <span class="tab-bar-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="5" y="3.5" width="14" height="17" rx="3"></rect>
+              <path d="M8 8h8"></path>
+              <path d="M9 12h.01"></path>
+              <path d="M12 12h.01"></path>
+              <path d="M15 12h.01"></path>
+              <path d="M9 15.5h.01"></path>
+              <path d="M12 15.5h.01"></path>
+              <path d="M15 15.5h.01"></path>
+            </svg>
+          </span>
+          <span class="tab-bar-label">Calcular</span>
+        </button>
+        <button class="tab-bar-item" data-tab-target="settle" role="tab" aria-selected="false">
+          <span class="tab-bar-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="7" cy="12" r="2.5"></circle>
+              <circle cx="17" cy="7" r="2.5"></circle>
+              <circle cx="17" cy="17" r="2.5"></circle>
+              <path d="M9.1 10.8l5.1-2.7"></path>
+              <path d="M9.1 13.2l5.1 2.7"></path>
+            </svg>
+          </span>
+          <span class="tab-bar-label">Repartir</span>
+        </button>
+        <button class="tab-bar-item" data-tab-target="settings" role="tab" aria-selected="false">
+          <span class="tab-bar-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01A1.65 1.65 0 0 0 10 3.09V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </span>
+          <span class="tab-bar-label">Ajustes</span>
+        </button>
+      </nav>
+    </div>
   </div>
 
   <script type="module">

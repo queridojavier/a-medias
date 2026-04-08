@@ -99,6 +99,7 @@ class SplitCalculator {
       const target = parseInt(btn.dataset.splitCount, 10);
       const isActive = target === activeCount;
       btn.classList.toggle('chip-button-active', isActive);
+      btn.classList.toggle('ios-chip--active', isActive);
     });
   }
 }

@@ -13,6 +13,8 @@ export const TIMINGS = {
 export const STORAGE_KEYS = {
   CALC_STATE: 'a_medias_calc_state',
   REIMBURSEMENTS: 'a_medias_reimbursements',
+  COMMON_EXPENSES: 'a_medias_common_expenses',
+  USER_SETTINGS: 'a_medias_user_settings',
   ACTIVE_TAB: 'a_medias_active_tab',
   STATE_VERSION: 'a_medias_state_version',
 };
@@ -42,14 +44,15 @@ export const SPLIT_MODES = {
 
 // Tabs de la aplicación
 export const TABS = {
+  SUMMARY: 'summary',
+  EXPENSES: 'expenses',
   CALC: 'calc',
-  REIMBURSE: 'reimburse',
-  SPLIT: 'split',
-  SHARE: 'share',
+  SETTLE: 'settle',
+  SETTINGS: 'settings',
 };
 
 // Estado de data version para migraciones
-export const DATA_VERSION = 3;
+export const DATA_VERSION = 5;
 
 // Valores por defecto
 export const DEFAULTS = {
