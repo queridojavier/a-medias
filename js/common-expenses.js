@@ -9,7 +9,6 @@ const DEFAULT_EXPENSES = () => [
     id: generateUUID(),
     concept: 'Hipoteca + gastos comunes',
     amount: 700,
-    frequency: 'monthly',
     dueDay: 1,
     category: 'Vivienda',
     notes: 'Cuenta común',
@@ -17,13 +16,11 @@ const DEFAULT_EXPENSES = () => [
 ];
 
 function getMonthlyAmount(expense) {
-  const amount = Number(expense.amount) || 0;
-  return expense.frequency === 'annual' ? round2(amount / 12) : round2(amount);
+  return round2(Number(expense.amount) || 0);
 }
 
 function getAnnualAmount(expense) {
-  const amount = Number(expense.amount) || 0;
-  return expense.frequency === 'annual' ? round2(amount) : round2(amount * 12);
+  return round2((Number(expense.amount) || 0) * 12);
 }
 
 class CommonExpensesManager {
@@ -69,7 +66,6 @@ class CommonExpensesManager {
       id: generateUUID(),
       concept: '',
       amount: 0,
-      frequency: 'monthly',
       dueDay: 0,
       category: 'Otros',
       notes: '',
@@ -78,23 +74,22 @@ class CommonExpensesManager {
   }
 
   /**
-   * Migra datos del formato antiguo (monthly, dueDate) al nuevo (amount, frequency, dueDay)
+   * Migra formatos antiguos: monthly→amount, dueDate→dueDay,
+   * y frequency='annual' → divide amount entre 12 para guardarlo siempre como mensual.
    */
   migrateExpense(item) {
     const migrated = { ...item };
 
-    // Migrar monthly → amount (si no tiene amount)
     if (migrated.monthly !== undefined && migrated.amount === undefined) {
       migrated.amount = Number(migrated.monthly) || 0;
       delete migrated.monthly;
     }
 
-    // Asegurar frequency
-    if (!migrated.frequency) {
-      migrated.frequency = 'monthly';
+    if (migrated.frequency === 'annual') {
+      migrated.amount = round2((Number(migrated.amount) || 0) / 12);
     }
+    delete migrated.frequency;
 
-    // Migrar dueDate → dueDay
     if (migrated.dueDate !== undefined && migrated.dueDay === undefined) {
       if (migrated.dueDate) {
         try {
@@ -129,7 +124,6 @@ class CommonExpensesManager {
         id: migrated?.id || generateUUID(),
         concept: String(migrated?.concept || ''),
         amount: round2(Number(migrated?.amount) || 0),
-        frequency: migrated?.frequency === 'annual' ? 'annual' : 'monthly',
         dueDay: Math.max(0, Math.min(31, parseInt(migrated?.dueDay) || 0)),
         category: categories.includes(migrated?.category) ? migrated.category : fallbackCategory,
         notes: String(migrated?.notes || ''),
@@ -178,10 +172,12 @@ class CommonExpensesManager {
     const expense = this.expenses.find((item) => item.id === expenseId);
     if (!expense) return null;
 
-    if (field === 'amount') {
-      expense.amount = round2(Math.max(0, parseFloat(String(rawValue || '').replace(',', '.')) || 0));
-    } else if (field === 'frequency') {
-      expense.frequency = rawValue === 'annual' ? 'annual' : 'monthly';
+    const parseMoney = (value) => Math.max(0, parseFloat(String(value || '').replace(',', '.')) || 0);
+
+    if (field === 'monthly') {
+      expense.amount = round2(parseMoney(rawValue));
+    } else if (field === 'annual') {
+      expense.amount = round2(parseMoney(rawValue) / 12);
     } else if (field === 'dueDay') {
       expense.dueDay = Math.max(0, Math.min(31, parseInt(rawValue) || 0));
     } else if (field === 'category') {
@@ -205,13 +201,20 @@ class CommonExpensesManager {
     const updatedExpense = this.updateExpense(expenseId, field, target.value);
     if (!updatedExpense) return;
 
-    // Actualizar columnas calculadas de esa fila
-    if (field === 'amount' || field === 'frequency') {
+    // Si cambió el mensual o anual, actualiza el otro input (no el que está escribiendo)
+    if (field === 'monthly' || field === 'annual') {
       const row = target.closest('tr');
-      const monthlyCell = row?.querySelector('.col-monthly');
-      const annualCell = row?.querySelector('.col-annual');
-      if (monthlyCell) monthlyCell.textContent = formatMoney(getMonthlyAmount(updatedExpense));
-      if (annualCell) annualCell.textContent = formatMoney(getAnnualAmount(updatedExpense));
+      if (field === 'monthly') {
+        const annualInput = row?.querySelector('input[data-field="annual"]');
+        if (annualInput && document.activeElement !== annualInput) {
+          annualInput.value = getAnnualAmount(updatedExpense);
+        }
+      } else {
+        const monthlyInput = row?.querySelector('input[data-field="monthly"]');
+        if (monthlyInput && document.activeElement !== monthlyInput) {
+          monthlyInput.value = getMonthlyAmount(updatedExpense);
+        }
+      }
     }
   }
 
@@ -246,7 +249,7 @@ class CommonExpensesManager {
             data-field="concept"
           >
         </td>
-        <td class="cell-amount" data-label="Importe">
+        <td class="cell-monthly" data-label="Mensual">
           <div class="table-money-input">
             <span>€</span>
             <input
@@ -254,24 +257,26 @@ class CommonExpensesManager {
               step="0.01"
               min="0"
               class="table-input table-input--money"
-              value="${expense.amount}"
+              value="${getMonthlyAmount(expense)}"
               data-expense-id="${escapeHtml(expense.id)}"
-              data-field="amount"
+              data-field="monthly"
             >
           </div>
         </td>
-        <td class="cell-frequency" data-label="Frecuencia">
-          <select
-            class="table-input table-select"
-            data-expense-id="${escapeHtml(expense.id)}"
-            data-field="frequency"
-          >
-            <option value="monthly" ${expense.frequency === 'monthly' ? 'selected' : ''}>Mes</option>
-            <option value="annual" ${expense.frequency === 'annual' ? 'selected' : ''}>Año</option>
-          </select>
+        <td class="cell-annual" data-label="Anual">
+          <div class="table-money-input">
+            <span>€</span>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              class="table-input table-input--money"
+              value="${getAnnualAmount(expense)}"
+              data-expense-id="${escapeHtml(expense.id)}"
+              data-field="annual"
+            >
+          </div>
         </td>
-        <td class="cell-monthly col-monthly" data-label="Mensual">${formatMoney(getMonthlyAmount(expense))}</td>
-        <td class="cell-annual col-annual" data-label="Anual">${formatMoney(getAnnualAmount(expense))}</td>
         <td class="cell-day" data-label="Día cobro">
           <input
             type="number"

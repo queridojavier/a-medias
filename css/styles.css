@@ -1549,7 +1549,7 @@ textarea::placeholder {
 
   /* ── Contenido principal ── */
   .app-main {
-    padding: 0 16px 96px;
+    padding: 0 16px calc(var(--safe-bottom) + 88px);
     -webkit-overflow-scrolling: touch;
   }
 
@@ -1722,7 +1722,6 @@ textarea::placeholder {
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
       "concept concept"
-      "amount frequency"
       "monthly annual"
       "day category"
       "notes notes"
@@ -1751,8 +1750,6 @@ textarea::placeholder {
   }
 
   .expenses-table .cell-concept { grid-area: concept; }
-  .expenses-table .cell-amount { grid-area: amount; }
-  .expenses-table .cell-frequency { grid-area: frequency; }
   .expenses-table .cell-monthly { grid-area: monthly; }
   .expenses-table .cell-annual { grid-area: annual; }
   .expenses-table .cell-day { grid-area: day; }
@@ -1763,18 +1760,13 @@ textarea::placeholder {
     align-items: flex-end;
   }
 
-  .expenses-table .cell-monthly,
-  .expenses-table .cell-annual {
-    font-size: 16px;
-  }
-
   .table-input {
     border-radius: 10px;
     padding: 10px 12px;
   }
 
   .table-input--money {
-    padding-left: 28px;
+    padding-left: 28px !important;
   }
 
   .table-money-input span {
@@ -1881,8 +1873,9 @@ textarea::placeholder {
     border-radius: 12px;
   }
 
-  /* ── Tab bar: barra sólida nativa ── */
+  /* ── Tab bar: barra sólida nativa, pegada al borde inferior ── */
   .tab-bar {
+    position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
@@ -1891,7 +1884,9 @@ textarea::placeholder {
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     padding: 6px 8px calc(var(--safe-bottom) + 4px);
     gap: 0;
-    background: rgba(10, 10, 12, 0.92);
+    background: #0a0a0c;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 
   .tab-bar-item {
