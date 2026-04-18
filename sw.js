@@ -1,4 +1,4 @@
-const CACHE = 'a-medias-v4.4';
+const CACHE = 'a-medias-v4.5';
 const ASSETS = [
   './',
   './index.html',

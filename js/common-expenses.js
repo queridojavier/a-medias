@@ -236,7 +236,7 @@ class CommonExpensesManager {
 
     tableBody.innerHTML = this.expenses.map((expense) => `
       <tr>
-        <td>
+        <td class="cell-concept" data-label="Concepto">
           <input
             type="text"
             class="table-input"
@@ -246,7 +246,7 @@ class CommonExpensesManager {
             data-field="concept"
           >
         </td>
-        <td>
+        <td class="cell-amount" data-label="Importe">
           <div class="table-money-input">
             <span>€</span>
             <input
@@ -260,7 +260,7 @@ class CommonExpensesManager {
             >
           </div>
         </td>
-        <td>
+        <td class="cell-frequency" data-label="Frecuencia">
           <select
             class="table-input table-select"
             data-expense-id="${escapeHtml(expense.id)}"
@@ -270,9 +270,9 @@ class CommonExpensesManager {
             <option value="annual" ${expense.frequency === 'annual' ? 'selected' : ''}>Año</option>
           </select>
         </td>
-        <td class="col-monthly">${formatMoney(getMonthlyAmount(expense))}</td>
-        <td class="col-annual">${formatMoney(getAnnualAmount(expense))}</td>
-        <td>
+        <td class="cell-monthly col-monthly" data-label="Mensual">${formatMoney(getMonthlyAmount(expense))}</td>
+        <td class="cell-annual col-annual" data-label="Anual">${formatMoney(getAnnualAmount(expense))}</td>
+        <td class="cell-day" data-label="Día cobro">
           <input
             type="number"
             min="1"
@@ -284,7 +284,7 @@ class CommonExpensesManager {
             data-field="dueDay"
           >
         </td>
-        <td>
+        <td class="cell-category" data-label="Categoría">
           <select
             class="table-input table-select"
             data-expense-id="${escapeHtml(expense.id)}"
@@ -295,7 +295,7 @@ class CommonExpensesManager {
             `).join('')}
           </select>
         </td>
-        <td>
+        <td class="cell-notes" data-label="Notas">
           <input
             type="text"
             class="table-input"
@@ -305,7 +305,7 @@ class CommonExpensesManager {
             data-field="notes"
           >
         </td>
-        <td class="table-actions">
+        <td class="cell-actions table-actions">
           <button type="button" class="icon-action" data-remove-expense="${escapeHtml(expense.id)}" aria-label="Eliminar fila">
             ×
           </button>
