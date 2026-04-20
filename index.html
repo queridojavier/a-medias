@@ -455,12 +455,12 @@
             <article class="summary-card">
               <div class="summary-card-header">
                 <div>
-                  <p class="summary-card-kicker">Plantilla en pareja</p>
-                  <h3>Sincronización por enlace</h3>
+                  <p class="summary-card-kicker">Sincronización</p>
+                  <h3>Tus dispositivos o con pareja</h3>
                 </div>
               </div>
               <p id="share-card-description" class="summary-card-text">
-                Crea un enlace privado para compartir la misma plantilla con tu pareja y mantener los datos actualizados en ambos dispositivos.
+                Nivel 1: abre la misma sesión en móvil y PC con un enlace privado. Nivel 2: comparte esa sesión con tu pareja para editar ambos a la vez.
               </p>
               <p id="share-status-text" class="ios-share-status">Guardado localmente en este dispositivo.</p>
               <p id="share-missing-config" class="ios-error hidden"></p>
@@ -485,24 +485,25 @@
 
                 <div class="settings-row">
                   <div>
-                    <p class="settings-row-title">Plantilla compartida</p>
-                    <p class="settings-row-text">Usad un enlace privado para editar ambos la misma base.</p>
+                    <p class="settings-row-title">Sincroniza mis dispositivos</p>
+                    <p class="settings-row-text">Abre la misma sesión en otro móvil o PC. Solo tú con el enlace.</p>
                   </div>
                 </div>
 
                 <div class="ios-share-actions">
-                  <button type="button" id="share-create" class="ios-btn-primary">Crear enlace seguro</button>
+                  <button type="button" id="share-create" class="ios-btn-primary">Sincronizar mis dispositivos</button>
+                  <button type="button" id="share-create-partner" class="ios-btn-secondary">Compartir con mi pareja</button>
                   <button type="button" id="share-copy" class="ios-btn-secondary hidden">Copiar enlace</button>
                   <button type="button" id="share-leave" class="ios-btn-text hidden">Salir del enlace</button>
                 </div>
 
                 <div id="share-link-wrapper" class="ios-share-link hidden">
-                  <label for="share-link-input" class="ios-label">Enlace compartido</label>
+                  <label for="share-link-input" class="ios-label">Enlace de sesión</label>
                   <div class="ios-share-link-row">
                     <input type="text" id="share-link-input" readonly class="ios-input" value="">
                     <button type="button" id="share-copy-secondary" class="ios-btn-secondary">Copiar</button>
                   </div>
-                  <p class="ios-hint">Quien tenga este enlace podrá ver y editar la misma información.</p>
+                  <p class="ios-hint">Cualquier dispositivo que abra este enlace verá y editará los mismos datos en tiempo real.</p>
                   <canvas id="share-qr-code" class="hidden" style="margin-top: 12px; border-radius: 12px; max-width: 200px;"></canvas>
                 </div>
 
@@ -655,6 +656,24 @@
           <span class="tab-bar-label">Ajustes</span>
         </button>
       </nav>
+    </div>
+  </div>
+
+  <div id="partner-share-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="partner-share-title">
+    <div class="modal-card">
+      <h3 id="partner-share-title">Compartir con tu pareja</h3>
+      <p class="modal-text">
+        Vas a generar un enlace que permitirá a otra persona ver y editar los mismos datos que tú, incluyendo cualquier cambio que hagáis a futuro.
+      </p>
+      <ul class="modal-list">
+        <li>Los datos están cifrados de extremo a extremo.</li>
+        <li>Cualquiera con el enlace entra sin contraseña.</li>
+        <li>Podéis dejar de compartir en cualquier momento.</li>
+      </ul>
+      <div class="modal-actions">
+        <button type="button" id="partner-share-cancel" class="ios-btn-text">Cancelar</button>
+        <button type="button" id="partner-share-confirm" class="ios-btn-primary">Entendido, crear enlace</button>
+      </div>
     </div>
   </div>
 

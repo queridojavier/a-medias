@@ -1,0 +1,10 @@
+{
+  "name": "a-medias",
+  "version": "4.7.0",
+  "private": true,
+  "description": "Gestión común en pareja - Local First PWA",
+  "type": "module",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}

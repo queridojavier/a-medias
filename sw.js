@@ -1,4 +1,4 @@
-const CACHE = 'a-medias-v4.6';
+const CACHE = 'a-medias-v4.7';
 const ASSETS = [
   './',
   './index.html',
@@ -12,6 +12,7 @@ const ASSETS = [
   './js/storage-local.js',
   './js/share-url.js',
   './js/sync-hybrid.js',
+  './js/cloud-sync.js',
   './js/calculator.js',
   './js/reimbursements.js',
   './js/split.js',

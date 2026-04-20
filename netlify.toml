@@ -3,6 +3,7 @@
 [build]
   # Sin build step - es HTML/CSS/JS puro
   publish = "."
+  functions = "netlify/functions"
 
 # Headers de seguridad
 [[headers]]

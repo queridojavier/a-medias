@@ -5,6 +5,7 @@ import { TABS, SYNC_STATUS, DATA_VERSION } from './constants.js';
 import { getElement, copyToClipboard, isOnline, logger, formatMoney, round2 } from './utils.js';
 import toast from './toast.js';
 import hybridSync from './sync-hybrid.js';
+import cloudSync, { CLOUD_STATUS } from './cloud-sync.js';
 import Calculator from './calculator.js';
 import ReimbursementsManager from './reimbursements.js';
 import SplitCalculator from './split.js';
@@ -23,7 +24,7 @@ class App {
   }
 
   async init() {
-    logger.log('[A Medias] Inicializando aplicación v3.0 (Local First)');
+    logger.log('[A Medias] Inicializando aplicación v4.7 (Local First + Cloud)');
 
     // Cachear elementos de UI global
     this.cacheElements();
@@ -31,7 +32,7 @@ class App {
     // Configurar callbacks
     this.setupCallbacks();
 
-    // Inicializar sistema híbrido de sync
+    // Inicializar sistema híbrido de sync (local IndexedDB)
     await hybridSync.init();
 
     // Inicializar módulos
@@ -49,6 +50,10 @@ class App {
     // Inicializar compartición
     await this.initSharing();
 
+    // Inicializar sesión cloud (adopta URL o restaura localStorage)
+    await cloudSync.init();
+    this.updateShareUI();
+
     // Monitorear online/offline
     this.setupOnlineMonitoring();
 
@@ -62,6 +67,7 @@ class App {
     this.elements = {
       // Share controls
       shareCreate: getElement('share-create'),
+      shareCreatePartner: getElement('share-create-partner'),
       shareCopy: getElement('share-copy'),
       shareCopySecondary: getElement('share-copy-secondary'),
       shareLeave: getElement('share-leave'),
@@ -70,6 +76,9 @@ class App {
       shareStatus: getElement('share-status-text'),
       shareMissingConfig: getElement('share-missing-config'),
       shareDescription: getElement('share-card-description'),
+      partnerModal: getElement('partner-share-modal'),
+      partnerModalConfirm: getElement('partner-share-confirm'),
+      partnerModalCancel: getElement('partner-share-cancel'),
       syncIndicator: getElement('sync-indicator'),
       offlineBanner: getElement('offline-banner'),
       summaryCommonExpenses: getElement('summary-common-expenses'),
@@ -128,6 +137,10 @@ class App {
     hybridSync.onStateChange = (remoteState) => this.handleRemoteStateChange(remoteState);
     hybridSync.onStatusChange = (status) => this.updateSyncUI(status);
 
+    // Cloud sync: estado remoto desde backend + indicador de estado
+    cloudSync.onRemoteState = (remoteState) => this.handleRemoteStateChange(remoteState);
+    cloudSync.onStatusChange = (status) => this.updateCloudStatus(status);
+
     // Conectar calculadora con reembolsos para compartir ingresos
     this.reimbursements.getCalculatorIncomes = () => this.calculator.getIncomes();
   }
@@ -181,16 +194,41 @@ class App {
     // Event listeners para botones de compartir
     const {
       shareCreate,
+      shareCreatePartner,
       shareCopy,
       shareCopySecondary,
       shareLeave,
       shareLinkInput,
+      partnerModal,
+      partnerModalConfirm,
+      partnerModalCancel,
       exportBackup,
       importBackup
     } = this.elements;
 
     if (shareCreate) {
-      shareCreate.addEventListener('click', () => this.createShare());
+      shareCreate.addEventListener('click', () => this.startPersonalSync());
+    }
+
+    if (shareCreatePartner) {
+      shareCreatePartner.addEventListener('click', () => this.openPartnerModal());
+    }
+
+    if (partnerModalConfirm) {
+      partnerModalConfirm.addEventListener('click', () => {
+        this.closePartnerModal();
+        this.startPartnerShare();
+      });
+    }
+
+    if (partnerModalCancel) {
+      partnerModalCancel.addEventListener('click', () => this.closePartnerModal());
+    }
+
+    if (partnerModal) {
+      partnerModal.addEventListener('click', (e) => {
+        if (e.target === partnerModal) this.closePartnerModal();
+      });
     }
 
     if (shareCopy) {
@@ -224,24 +262,70 @@ class App {
   }
 
   /**
-   * Crea un enlace compartido (vía URL)
+   * Nivel 1: sincronización entre tus propios dispositivos.
+   * Crea una sesión cloud y muestra el enlace con clave en el fragment.
    */
-  async createShare() {
-    const currentState = this.exportAppState();
-    const url = await hybridSync.createShareURL(currentState);
-
-    if (url) {
+  async startPersonalSync() {
+    if (cloudSync.isActive()) {
+      toast.info('Ya tienes una sesión activa');
       this.updateShareUI();
+      await this.renderQRCode();
+      return;
+    }
 
-      // Mostrar código QR si existe el elemento
-      const qrCodeEl = this.elements.shareQRCode;
-      if (qrCodeEl) {
-        const qrUrl = hybridSync.generateQRCode();
-        if (qrUrl) {
-          qrCodeEl.src = qrUrl;
-          qrCodeEl.classList.remove('hidden');
-        }
-      }
+    const currentState = this.exportAppState();
+    try {
+      await cloudSync.createSession(currentState);
+      this.updateShareUI();
+      await this.renderQRCode();
+      toast.success('Sesión creada. Abre el enlace en tu otro dispositivo.');
+    } catch (err) {
+      logger.error('[A Medias] Error creando sesión cloud:', err);
+      toast.error('No se pudo crear la sesión. Revisa tu conexión.');
+    }
+  }
+
+  openPartnerModal() {
+    const modal = this.elements.partnerModal;
+    if (!modal) return;
+    modal.classList.remove('hidden');
+  }
+
+  closePartnerModal() {
+    const modal = this.elements.partnerModal;
+    if (!modal) return;
+    modal.classList.add('hidden');
+  }
+
+  /**
+   * Nivel 2: misma mecánica que nivel 1, pero tras aviso explícito.
+   */
+  async startPartnerShare() {
+    if (cloudSync.isActive()) {
+      this.updateShareUI();
+      await this.renderQRCode();
+      this.copyShareLink();
+      return;
+    }
+    await this.startPersonalSync();
+    // Tras crearla, copiar al portapapeles para facilitar compartir
+    this.copyShareLink();
+  }
+
+  async renderQRCode() {
+    const qrCodeEl = this.elements.shareQRCode;
+    const url = cloudSync.getShareURL();
+    if (!qrCodeEl || !url) return;
+    if (typeof window.QRCode === 'undefined' || !window.QRCode.toCanvas) {
+      qrCodeEl.classList.add('hidden');
+      return;
+    }
+    try {
+      await window.QRCode.toCanvas(qrCodeEl, url, { width: 200, margin: 1 });
+      qrCodeEl.classList.remove('hidden');
+    } catch (err) {
+      logger.error('[A Medias] Error generando QR:', err);
+      qrCodeEl.classList.add('hidden');
     }
   }
 
@@ -249,7 +333,7 @@ class App {
    * Copia el enlace compartido al portapapeles
    */
   async copyShareLink() {
-    const link = hybridSync.getShareURL();
+    const link = cloudSync.getShareURL();
     if (!link) return;
 
     const success = await copyToClipboard(link);
@@ -266,19 +350,22 @@ class App {
   }
 
   /**
-   * Sale del enlace compartido
+   * Sale del enlace compartido (los datos quedan en local)
    */
   async leaveShare() {
-    const success = await hybridSync.leaveShare();
-    if (success) {
-      this.updateShareUI();
+    const confirmed = window.confirm(
+      '¿Dejar de sincronizar? Los datos seguirán guardados localmente en este dispositivo.'
+    );
+    if (!confirmed) return;
 
-      // Ocultar QR code
-      const qrCodeEl = this.elements.shareQRCode;
-      if (qrCodeEl) {
-        qrCodeEl.classList.add('hidden');
-      }
+    await cloudSync.leaveSession();
+    this.updateShareUI();
+
+    const qrCodeEl = this.elements.shareQRCode;
+    if (qrCodeEl) {
+      qrCodeEl.classList.add('hidden');
     }
+    toast.info('Has salido de la sesión');
   }
 
   /**
@@ -287,6 +374,7 @@ class App {
   updateShareUI() {
     const {
       shareCreate,
+      shareCreatePartner,
       shareCopy,
       shareCopySecondary,
       shareLeave,
@@ -294,44 +382,52 @@ class App {
       shareLinkInput,
       shareStatus,
       shareMissingConfig,
-      shareDescription,
     } = this.elements;
 
     if (!shareCreate || !shareStatus) return;
 
-    const syncInfo = hybridSync.getSyncInfo();
-    const isSharing = syncInfo.isSharing;
+    const info = cloudSync.getInfo();
+    const isActive = info.active;
 
-    // Ocultar mensaje de "config faltante" - ya no es necesario con Local First
     shareMissingConfig?.classList.add('hidden');
 
-    // Actualizar descripción
-    if (shareDescription) {
-      shareDescription.textContent = 'Comparte un enlace para sincronizar con otro dispositivo. No requiere registro ni servidor.';
-    }
+    shareCreate.classList.toggle('hidden', isActive);
+    shareCreate.disabled = isActive;
+    shareCreatePartner?.classList.toggle('hidden', isActive);
+    if (shareCreatePartner) shareCreatePartner.disabled = isActive;
 
-    // Mostrar/ocultar elementos según si está compartiendo
-    shareCreate.classList.toggle('hidden', isSharing);
-    shareCreate.disabled = isSharing;
-    shareCopy?.classList.toggle('hidden', !isSharing);
-    shareCopySecondary?.classList.toggle('hidden', !isSharing);
-    shareLeave?.classList.toggle('hidden', !isSharing);
-    shareLinkWrapper?.classList.toggle('hidden', !isSharing);
+    shareCopy?.classList.toggle('hidden', !isActive);
+    shareCopySecondary?.classList.toggle('hidden', !isActive);
+    shareLeave?.classList.toggle('hidden', !isActive);
+    shareLinkWrapper?.classList.toggle('hidden', !isActive);
 
-    // Actualizar texto de status
-    if (!isSharing) {
+    shareStatus.className = 'ios-share-status';
+    shareStatus.style.color = '';
+    if (!isActive) {
       shareStatus.textContent = 'Guardado localmente en este dispositivo.';
-      shareStatus.className = 'ios-share-status';
     } else {
-      shareStatus.textContent = `Compartiendo vía ${syncInfo.backend}`;
-      shareStatus.className = 'ios-share-status';
+      shareStatus.textContent = `Sesión activa — los cambios se sincronizan en la nube (${info.status}).`;
       shareStatus.style.color = 'var(--green)';
     }
 
-    // Actualizar input del enlace
-    if (isSharing && shareLinkInput) {
-      shareLinkInput.value = syncInfo.shareUrl || '';
+    if (isActive && shareLinkInput) {
+      shareLinkInput.value = info.shareUrl || '';
     }
+  }
+
+  /**
+   * Refleja el estado del cloud-sync en el indicador superior.
+   */
+  updateCloudStatus(cloudStatus) {
+    const map = {
+      [CLOUD_STATUS.IDLE]: SYNC_STATUS.IDLE,
+      [CLOUD_STATUS.SAVING]: SYNC_STATUS.SAVING,
+      [CLOUD_STATUS.SYNCED]: SYNC_STATUS.SYNCED,
+      [CLOUD_STATUS.OFFLINE]: SYNC_STATUS.ERROR,
+      [CLOUD_STATUS.ERROR]: SYNC_STATUS.ERROR,
+    };
+    this.updateSyncUI(map[cloudStatus] || SYNC_STATUS.IDLE);
+    this.updateShareUI();
   }
 
   /**
@@ -403,10 +499,9 @@ class App {
     // Guardar localmente con debounce
     hybridSync.saveState(currentState);
 
-    // Si está compartiendo, actualizar URL
-    const syncInfo = hybridSync.getSyncInfo();
-    if (syncInfo.isSharing && syncInfo.mode === 'url') {
-      hybridSync.updateShareURL(currentState);
+    // Si hay sesión cloud activa, subir con debounce
+    if (cloudSync.isActive()) {
+      cloudSync.pushDebounced(currentState);
     }
   }
 
